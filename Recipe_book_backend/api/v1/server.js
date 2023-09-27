@@ -1,9 +1,15 @@
-import generalRoutes from  './routes/index.js';
-import express from 'express';
-import cors from 'cors';
+const generalRoutes = require('./routes/index.js');
+const express = require('express');
+const cors = require('cors');
+const gracefulShutdown = require('express-graceful-shutdown');
+const morgan = require('morgan');
+require('dotenv').config();
+
+const {db_storage} = require('./models/engine/db_storage.js')
 
 const app = express();
 const PORT = 1245;
+
 // Enable cors
 app.use(
     cors({
@@ -16,6 +22,9 @@ app.use(
 
 app.use(express.json());
 
+// for logging requests details
+app.use(morgan('dev'));
+
 // maps all routes to our express app
 generalRoutes(app);
 
@@ -23,5 +32,6 @@ app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT}`);
 });
 
-// exports for es6 and commonjs
-export default app;
+app.use(gracefulShutdown(app));
+
+module.exports = app;

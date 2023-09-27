@@ -1,4 +1,4 @@
-import AppController from "../controllers/AppController.js";
+const AppController = require("../controllers/AppController.js");
 
 /**
  * Binds the routes to the appropriate handler in the
@@ -11,6 +11,7 @@ const PATH_PREFIX = '/api/v1'
 
 const generalRoutes = (app) => {
   app.get(PATH_PREFIX, AppController.home);
+  app.get(PATH_PREFIX + '/play', AppController.play);
 };
 
-export default generalRoutes;
+module.exports = generalRoutes;

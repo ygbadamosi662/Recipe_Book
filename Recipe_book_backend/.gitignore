@@ -1,2 +1,4 @@
 **/node_modules/
 **/package-lock.json
+**/mongo_setup.js
+**/.env
