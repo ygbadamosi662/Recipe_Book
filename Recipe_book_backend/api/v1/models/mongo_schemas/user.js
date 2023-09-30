@@ -1,16 +1,15 @@
 const validator = require('validator');
-const util = require('../../utils');
 const { Schema } = require('mongoose');
 const { Role } = require('../../enum_ish');
-const { recipeSchema } = require('../mongo_schemas/recipe');
+const { Recipe_str } = require('../../global_constants');
 
 const userSchema = new Schema({
-  fname: {
-    type: String,
-    required: true,
-  },
-  lname: {
-    type: String,
+  name: { 
+    type: {
+      fname: { type: String, required: true },
+      lname: { type: String, required: true },
+      aka: String,
+    },
     required: true,
   },
   email: {
@@ -36,10 +35,15 @@ const userSchema = new Schema({
     },
   },
   recipes: {
-    type: [recipeSchema],
+    type: [Schema.Types.ObjectId],
+    ref: Recipe_str,
     default: [],
-  }
-  ,
+  },
+  faves: {
+    type: [Schema.Types.ObjectId],
+    ref: Recipe_str,
+    default: [],
+  },
   dob: {
     type: Date,
   },
@@ -53,37 +57,34 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 userSchema.pre('validate', function (next) {
-  if (this.fname && this.fname.length < 2) {
+  if (this.name.fname && this.name.fname.length < 2) {
     return next(new Error('fname is too short'));
   }
 
-  if (this.lname && this.lname.length < 2) {
+  if (this.name.lname && this.name.lname.length < 2) {
     return next(new Error('lname is too short'));
   }
 
-  if (this.lname && this.lname.length > 20) {
+  if (this.name.lname && this.name.lname.length > 20) {
     return next(new Error('lname is too long'));
   }
 
-  if (this.fname && this.fname.length > 20) {
+  if (this.name.fname && this.name.fname.length > 20) {
     return next(new Error('fname is too long'));
+  }
+
+  if (this.name.aka) {
+    if (this.name.aka && this.name.aka.length < 2) {
+      return next(new Error('lname is too short'));
+    }
+  
+    if (this.name.aka && this.name.aka.length > 20) {
+      return next(new Error('lname is too long'));
+    }
   }
 
   next();
 });
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
-  
-  try {
-    this.password = await util.encrypt_pwd(this.password);
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
 module.exports = userSchema;

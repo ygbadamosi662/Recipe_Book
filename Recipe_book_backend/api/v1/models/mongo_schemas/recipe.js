@@ -1,6 +1,5 @@
-const validator = require('validator');
-const util = require('../../utils');
 const { Schema } = require('mongoose');
+const { User_str } = require('../../global_constants')
 
 const recipeSchema = new Schema({
   name: {
@@ -16,6 +15,11 @@ const recipeSchema = new Schema({
   ,
   guide: {
     type: [String],
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: User_str,
+    default: null,
   }
 }, { timestamps: true });
 

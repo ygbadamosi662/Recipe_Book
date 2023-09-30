@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const userSchema = require('../mongo_schemas/user');
 const recipeSchema = require('../mongo_schemas/recipe');
+const { Recipe_str, User_str } = require('../../global_constants');
 require('dotenv').config();
 
 const db_name = process.env.DB;
@@ -11,17 +12,19 @@ const db_port = process.env.DB_PORT;
 
 class DbStorage {
   constructor() {
-    // initializes a new DbStorage instance
-    mongoose.connect(`mongodb://${db_user}:${db_pwd}@${db_host}:${db_port}/${db_name}`)
-      .then(() => {
+    try {
+      // initializes a new DbStorage instance
+      this._conn = mongoose.createConnection(`mongodb://${db_user}:${db_pwd}@${db_host}:${db_port}/${db_name}`)
+      this._conn.once('open', () => {
         console.log('Database connection successfull');
-      })
-      .catch((error) => {
-        console.log('Database connection failed');
       });
 
-    this._mongo_db = mongoose;
-    this.mongo_repos = {};
+      this._mongo_db = mongoose;
+      this.mongo_repos = {};
+    } catch (error) {
+      console.log('Database connection failed');
+      throw error;
+    }
 
   }
 
@@ -29,34 +32,40 @@ class DbStorage {
     return this._mongo_db;
   }
 
-  // get mongo_repos() {
-  //   return this.mongo_repos;
-  // }
-
   set mongo_db(value) {
     this._mongo_db = value;
   }
 
-  async get_a_repo (key) {
-    
-    await this.reload();
-    // console.log(key, this.mongo_repos);
+  get_a_repo (key) {
     if (key in this.mongo_repos) {
-      console.log("okay", this.mongo_repos[key])
       return this.mongo_repos[key]; 
+    }
+    else {
+      throw mongoose.Error(`${key} collection not in db`);
     }
   }
 
-  async reload() {
+  async close_connection () {
+    try {
+      await this._conn.close()
+      console.log('Database connection closed', new Date().getTime());
+    } catch (error) {
+      console.log('Na me throw error, form close_connection');
+      throw error;
+    }
+  }
+
+  reload() {
     try {
       // set models
-      const User = await this._mongo_db.model('User', userSchema);
-      const Recipe = await this._mongo_db.model('Recipe', recipeSchema);
+      
+      const User = this._conn.model(User_str, userSchema);
+      const Recipe = this._conn.model(Recipe_str, recipeSchema);
 
       // collect repos
       this.mongo_repos.User = User;
       this.mongo_repos.Recipe = Recipe;
-      // console.log(this.mongo_repos)
+
     } catch (error) {
       throw error;
     }
@@ -64,6 +73,7 @@ class DbStorage {
 
 }
 
-db_storage = new DbStorage();
+const db_storage = new DbStorage();
+db_storage.reload();
 
-module.exports = db_storage;
+module.exports = { db_storage };

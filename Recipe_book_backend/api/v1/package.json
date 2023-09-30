@@ -9,8 +9,9 @@
     "check-lint": "lint [0-9]*.js",
     "test": "./node_modules/.bin/mocha --require @babel/register --exit",
     "dev": "nodemon --exec babel-node --presets @babel/preset-env",
-    "run_api": "node server.js",
-    "setup_mongodb": "node mongo_setup.js"
+    "run_api": "node --trace-warnings server.js",
+    "setup_mongodb": "node mongo_setup.js",
+    "demon": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -37,7 +38,7 @@
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jest": "^27.4.0",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.2",
+    "nodemon": "^2.0.22",
     "request": "^2.88.0",
     "sinon": "^7.5.0"
   }
