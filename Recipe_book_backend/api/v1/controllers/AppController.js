@@ -8,6 +8,7 @@ const { db_storage } = require('../models/engine/db_storage')
 const util = require('../util');
 const { jwt_service } = require('../jwt_service');
 const Joi = require('joi');
+const { JWT_BLACKLIST_str } = require('../global_constants')
 const mongoose = require('mongoose');
 const MongooseError = mongoose.Error;
 
@@ -140,6 +141,35 @@ class AppController {
             error: 'Invalid request body',
             errors: error.details,
           });
+      }
+    }
+  }
+
+  static async logout(req, response) {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader && authHeader.split(' ')[1]; // Extract the token part
+      const user_promise = user_repo.findByEmail(req.user.email);
+      const jwt_repo = db_storage.get_a_repo(JWT_BLACKLIST_str);
+      const user = await user_promise;
+      const nigga = await jwt_repo
+        .create({
+          token: token,
+          user: user,
+        });
+    
+      return response
+        .status(200)
+        .json({
+          message: 'Logged out succesfully',
+          user: user.name,
+          token: nigga.token,
+        });
+      
+    } catch (error) {
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
       }
     }
   }

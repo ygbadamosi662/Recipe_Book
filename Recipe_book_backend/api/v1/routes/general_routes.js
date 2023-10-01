@@ -17,6 +17,7 @@ generalRoutes.get('/play', AppController.play);
 generalRoutes.post('/register', AppController.register_user);
 generalRoutes.post('/login', AppController.login);
 generalRoutes.get('/get_user', auth_token, UserController.get_user);
+generalRoutes.get('/logout', auth_token, AppController.logout);
 
 
 

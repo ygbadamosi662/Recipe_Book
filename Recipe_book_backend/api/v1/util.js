@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const { db_storage } = require('./models/engine/db_storage');
 
 /**
  * Defines Utility class.
