@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const userSchema = require('../mongo_schemas/user');
 const recipeSchema = require('../mongo_schemas/recipe');
-const jwt_BlacklistSchema = require('../mongo_schemas/jwt_blacklist');
-const { Recipe_str, User_str, JWT_BLACKLIST_str } = require('../../global_constants');
+const { Recipe_str, User_str } = require('../../global_constants');
+const fs = require('fs').promises;
+const path = require('path');
 require('dotenv').config();
 
 const db_name = process.env.DB;
@@ -23,6 +24,7 @@ class DbStorage {
 
       this._mongo_db = mongoose;
       this.mongo_repos = {};
+      this._json_file = path.join(__dirname, 'blacklist.json');;
     } catch (error) {
       console.log('Database connection failed');
       throw error;
@@ -62,13 +64,50 @@ class DbStorage {
       // set models
       const User = this._conn.model(User_str, userSchema);
       const Recipe = this._conn.model(Recipe_str, recipeSchema);
-      const JwtBlacklist = this._conn.model(JWT_BLACKLIST_str, jwt_BlacklistSchema);
 
       // collect repos
       this.mongo_repos.User = User;
       this.mongo_repos.Recipe = Recipe;
-      this.mongo_repos.JwtBlacklist = JwtBlacklist;
 
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async blacklist_jwt(jwtObj) {
+    try {
+      // Read data from blacklist.json
+      const data = await fs.readFile(this._json_file, 'utf8');
+      let jsonData;
+      if (!data) {
+        jsonData = {
+          jwts: [],
+        };
+      } else {
+        jsonData = JSON.parse(data);
+      }
+  
+      jsonData.jwts.push(jwtObj);
+  
+      const updatedData = JSON.stringify(jsonData, null, 2);
+  
+      await fs.writeFile(this._json_file, updatedData, 'utf8');
+  
+      console.log('jwt blacklisted');
+      
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async get_jwt(token) {
+    try {
+      const jsonData = await fs.readFile(this._json_file, 'utf8');
+      if (!jsonData) {
+        return null;
+      }
+      const jwt = JSON.parse(jsonData).jwts.find((j) => j.token === token);
+      return jwt;
     } catch (error) {
       throw error;
     }

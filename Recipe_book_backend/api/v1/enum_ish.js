@@ -1,4 +1,9 @@
-const Role = { user: 'USER', admin: 'ADMIN' }
+const Role = { user: 'USER', admin: 'ADMIN' };
+const Type = { 
+    soup: 'SOUP',
+    pastry: 'PATRY',
+    pasta: 'PASTA',
+    pizza: 'PIZZA',
+};
 
-
-module.exports = { Role }
+module.exports = { Role, Type }

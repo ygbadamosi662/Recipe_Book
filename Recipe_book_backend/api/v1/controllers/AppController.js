@@ -3,12 +3,11 @@
  * which defines route handlers.
  * @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
  */
-const user_repo = require('../repos/user_repo');
+const { user_repo } = require('../repos/user_repo');
 const { db_storage } = require('../models/engine/db_storage')
 const util = require('../util');
 const { jwt_service } = require('../jwt_service');
 const Joi = require('joi');
-const { JWT_BLACKLIST_str } = require('../global_constants')
 const mongoose = require('mongoose');
 const MongooseError = mongoose.Error;
 
@@ -91,6 +90,8 @@ class AppController {
           errors: error.details,
         });
       }
+      console.log(error);
+      res.status(500).json({error: error.message});
     }
   }
 
@@ -142,6 +143,8 @@ class AppController {
             errors: error.details,
           });
       }
+      console.log(error);
+      res.status(500).json({error: error.message});
     }
   }
 
@@ -149,21 +152,22 @@ class AppController {
     try {
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1]; // Extract the token part
-      const user_promise = user_repo.findByEmail(req.user.email);
-      const jwt_repo = db_storage.get_a_repo(JWT_BLACKLIST_str);
+      const user_promise = user_repo.findByEmail(req.user.email, ['id']);
+      const timestamp = new Date().toISOString();
       const user = await user_promise;
-      const nigga = await jwt_repo
-        .create({
-          token: token,
-          user: user,
-        });
+      const jwt = {
+        token: token,
+        user: user.id,
+        created_on: timestamp,
+      }
+
+      await db_storage.blacklist_jwt(jwt);
     
       return response
         .status(200)
         .json({
           message: 'Logged out succesfully',
-          user: user.name,
-          token: nigga.token,
+          token: token,
         });
       
     } catch (error) {
@@ -171,6 +175,8 @@ class AppController {
         console.log('We have a mongoose problem', error.message);
         return res.status(500).json({error: error.message});
       }
+      console.log(error);
+      response.status(500).json({error: error.message});
     }
   }
 
@@ -194,6 +200,7 @@ class AppController {
       console.log(error, 'err caught now', err);
       return response.status(400).json({ message: 'Bad Request' });
     }
+    
   }
 }
 

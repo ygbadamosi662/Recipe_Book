@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const { db_storage } = require('./models/engine/db_storage');
-const { JWT_BLACKLIST_str } = require('./global_constants');
 require('dotenv').config();
 /**
  * Contains the JwtService class
@@ -27,29 +26,32 @@ class JwtService {
 }
 
 
-const auth_token = async (req, res, next) => {
+const authenticate_token = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Extract the token part
 
   if (!token) {
     return res.status(401);
   }
+  try {
+    const jwt = await db_storage.get_jwt(token);
+    if (jwt) {
+      return res
+      .status(400)
+      .json({ message: 'Invalid token, User should log in again' });
+    }
+  } catch (error) {
+    console.log('FS error', error);
+  }
   
   jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
     if (err) {
       return res.status(401); // Forbidden
     }
-    const repo = db_storage.get_a_repo(JWT_BLACKLIST_str);
-    const nigga = await repo.findOne({ token: token});
-    if (nigga) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid token, User should log in again' });
-    }
-    req.user = jwt.decode(token);
+    req.user = user;
     next();
   });
 }
 const jwt_service = new JwtService(); 
 
-module.exports = { jwt_service, JwtService, auth_token };
+module.exports = { jwt_service, JwtService, authenticate_token };

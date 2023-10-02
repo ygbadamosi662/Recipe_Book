@@ -15,12 +15,14 @@ const recipeSchema = new Schema({
   ,
   guide: {
     type: [String],
+    default: []
   },
   user: {
     type: Schema.Types.ObjectId,
     ref: User_str,
-    default: null,
-  }
+    required: true,
+  },
+  type: String,
 }, { timestamps: true });
 
 recipeSchema.pre('validate', function (next) {

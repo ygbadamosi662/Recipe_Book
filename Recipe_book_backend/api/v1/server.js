@@ -1,5 +1,7 @@
 process.traceProcessWarnings = true;
-const generalRoutes = require('./routes/general_routes.js');
+const { generalRoutes } = require('./routes/general_routes.js');
+const { authRoutes } = require('./routes/auth_routes.js');
+const { authenticate_token } = require('./jwt_service.js');
 const express = require('express');
 const cors = require('cors');
 const gracefulShutdown = require('express-graceful-shutdown');
@@ -33,6 +35,7 @@ app.use(morgan('dev'));
 
 // maps all routes to our express app
 app.use(PATH_PREFIX+'/general', generalRoutes);
+app.use(PATH_PREFIX+'/auth', authenticate_token, authRoutes);
 // generalRoutes(app);
 
 app.listen(PORT, () => {

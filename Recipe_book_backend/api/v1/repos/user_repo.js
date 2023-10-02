@@ -15,6 +15,10 @@ class UserRepo {
      
   }
 
+  get repo() {
+    return this._repo;
+  }
+
   async findByEmail(email, select=[]) {
     if (!email) { return };
     try {
@@ -33,11 +37,7 @@ class UserRepo {
     if (!phone) { return };
     try {
       let query = this._repo.exists({ phone: phone});
-      const user = await query.exec();
-      if (user) {
-        return true;
-      }
-      return false;
+      return await query.exec();
     } catch (error) {
       throw error;
     }
@@ -47,11 +47,7 @@ class UserRepo {
     if (!email) { return };
     try {
       let query = this._repo.exists({ email: email});
-      const user = await query.exec();
-      if (user) {
-        return true;
-      }
-      return false;
+      return await query.exec();
     } catch (error) {
       throw error;
     }
@@ -82,6 +78,7 @@ class UserRepo {
   //   }
   // }
 }
-user_repo = new UserRepo();
 
-module.exports = user_repo;
+const user_repo = new UserRepo();
+
+module.exports = {User: user_repo.repo, user_repo};

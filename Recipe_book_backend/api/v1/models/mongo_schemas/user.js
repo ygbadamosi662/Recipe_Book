@@ -52,7 +52,7 @@ const userSchema = new Schema({
     required: true,
   },
   role: {
-    type: { type: String, enum: Object.values(Role)},
+    type: { type: String, enum: Object.values(Role) }
   },
 }, { timestamps: true });
 
