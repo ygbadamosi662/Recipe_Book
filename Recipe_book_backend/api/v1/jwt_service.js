@@ -1,11 +1,12 @@
-const jwt = require('jsonwebtoken');
-const { db_storage } = require('./models/engine/db_storage');
-require('dotenv').config();
 /**
  * Contains the JwtService class
  * handles all jwt operations
  * @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
  */
+const jwt = require('jsonwebtoken');
+const { db_storage } = require('./models/engine/db_storage');
+require('dotenv').config();
+
 class JwtService {
   constructor (){
     this._jwt_key = process.env.JWT_SECRET;
@@ -29,9 +30,12 @@ class JwtService {
 const authenticate_token = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Extract the token part
-
   if (!token) {
-    return res.status(401);
+    return res
+      .status(401)
+      .json({
+        message: 'No auth token',
+      });
   }
   try {
     const jwt = await db_storage.get_jwt(token);

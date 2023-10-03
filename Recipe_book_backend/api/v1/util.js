@@ -31,6 +31,22 @@ class Utility {
       throw error;
     }
   }
+
+  get_what_is_set(obj, except_these) {
+    try {
+      if (!obj) { return }
+      if (!except_these) {
+        return Object.entries(obj)
+          .filter(([key, value]) => value !== undefined && value !== null)
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+      }
+      return Object.entries(obj)
+        .filter(([key, value]) => value !== undefined && value !== null && !except_these.includes(key))
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+    } catch (error) {
+      throw error;
+    }
+  }
   
 }
 

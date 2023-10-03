@@ -1,6 +1,6 @@
 const { Schema } = require('mongoose');
-const { User_str } = require('../../global_constants')
-
+const { User_str } = require('../../global_constants');
+const { Permit } = require('../../enum_ish');
 const recipeSchema = new Schema({
   name: {
     type: String,
@@ -21,6 +21,11 @@ const recipeSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: User_str,
     required: true,
+  },
+  permit: {
+    type: String,
+    enum: Object.values(Permit),
+    default: Permit.public,
   },
   type: String,
 }, { timestamps: true });

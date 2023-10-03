@@ -8,6 +8,7 @@ const { db_storage } = require('../models/engine/db_storage')
 const util = require('../util');
 const { jwt_service } = require('../jwt_service');
 const Joi = require('joi');
+const { Role } = require('../enum_ish')
 const mongoose = require('mongoose');
 const MongooseError = mongoose.Error;
 
@@ -68,12 +69,14 @@ class AppController {
       },
       email: value.email,
       phone: value.phone,
+      role: Role.user,
     };
 
     // encrypt pwd
     user.password = await util.encrypt_pwd(value.password);
 
     const resoled_u = await user_repo.create_user(user);
+    console.log(user)
 
     return response
       .status(201)

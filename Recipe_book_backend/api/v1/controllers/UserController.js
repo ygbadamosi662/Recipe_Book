@@ -1,8 +1,3 @@
-/**
- * Contains the UserController class 
- * which defines route handlers.
- * @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
- */
 const util = require('../util');
 const { user_repo } = require('../repos/user_repo');
 const { Recipe } = require('../repos/recipe_repo');
@@ -10,6 +5,12 @@ const MongooseError = require('mongoose').Error;
 const JsonWebTokenErro = require('jsonwebtoken').JsonWebTokenError;
 const Joi = require('joi');
 const { db_storage } = require('../models/engine/db_storage');
+const { Permit } = require('../enum_ish');
+/**
+ * Contains the UserController class 
+ * which defines route handlers.
+ * @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
+ */
 
 class UserController {
   static async get_user(req, res) {
@@ -47,6 +48,10 @@ class UserController {
         type: Joi
           .string()
           .required(),
+        permit: Joi
+          .string()
+          .valid(...Object.values(Permit))
+          .required()
       });
 
       // validate body
@@ -76,6 +81,7 @@ class UserController {
         .status(200)
         .json({
           message: `Recipe ${recipe.name} successfully created`,
+          recipe: recipe,
         });
     } catch (error) {
       
@@ -91,6 +97,111 @@ class UserController {
       res.status(500).json({error: error.message});
     }
   }
+
+  static async update_recipe(req, res) {
+    try {
+      const schema = Joi.object({
+        id: Joi
+          .string()
+          .required(),
+        name: Joi
+          .string(),
+        ingredients: Joi
+          .array()
+          .items(Joi.string()),
+        guide: Joi
+          .array()
+          .items(Joi.string()),
+        inspiration: Joi
+          .string(),
+        type: Joi
+          .string(),
+        permit: Joi
+          .string()
+          .valid(...Object.values(Permit))
+      });
+
+      // validate body
+      const { value, error } = schema.validate(req.body);
+      
+      if (error) {
+        throw error;
+      }
+
+      // update recipe
+      const exist_promise = Recipe.exists({ id: value.id });
+      const update_data = util.get_what_is_set(value, ['id']);
+
+      // validate recipe
+      const exists = await exist_promise;
+
+      if (exists === false) {
+        return res
+          .status(400)
+          .json({
+            message: `Invalid request, There is no recipe with id: ${value.id}`,
+          })
+      }
+
+      const result = await Recipe.updateOne({ id: value.id }, update_data);
+
+      return res
+        .status(200)
+        .json({
+          message: `Recipe ${value.id} successfully updated`,
+          result,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+  
+  static async get_recipe(req, res) {
+    try {
+      if (!req.params.id) { return res.status(400).json({ msg: 'id is required'}); }
+      const recipe = await Recipe.findById(req.params.id).exec();
+
+      if (recipe.permit === Permit.private) {
+        const user = await user_repo.findByEmail(req.user.email, ['id']);
+        if (user.id !== recipe.user) {
+          return res
+            .status(401)
+            .json({
+              msg: 'Invalid Request, Recipe is private',
+            })
+        }
+      }
+
+      return res
+        .status(200)
+        .json({
+          recipe: recipe,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
 }
   
 module.exports = UserController;
