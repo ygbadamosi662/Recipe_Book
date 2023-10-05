@@ -6,7 +6,7 @@
 
 const User_str = 'User';
 const Recipe_str = 'Recipe';
-const JWT_BLACKLIST_str = 'JwtBlacklist';
+const Review_str = 'Review';
 
 
-module.exports = { User_str, Recipe_str, JWT_BLACKLIST_str };
+module.exports = { User_str, Recipe_str, Review_str };

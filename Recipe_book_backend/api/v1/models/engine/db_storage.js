@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const userSchema = require('../mongo_schemas/user');
 const recipeSchema = require('../mongo_schemas/recipe');
-const { Recipe_str, User_str } = require('../../global_constants');
+const reviewSchema = require('../mongo_schemas/review');
+const { Recipe_str, User_str, Review_str } = require('../../global_constants');
 const fs = require('fs').promises;
 const path = require('path');
 require('dotenv').config();
@@ -64,10 +65,12 @@ class DbStorage {
       // set models
       const User = this._conn.model(User_str, userSchema);
       const Recipe = this._conn.model(Recipe_str, recipeSchema);
+      const Review = this._conn.model(Review_str, reviewSchema);
 
       // collect repos
       this.mongo_repos.User = User;
       this.mongo_repos.Recipe = Recipe;
+      this.mongo_repos.Review = Review;
 
     } catch (error) {
       throw error;

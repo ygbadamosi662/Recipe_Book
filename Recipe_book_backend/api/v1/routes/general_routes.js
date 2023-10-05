@@ -13,7 +13,6 @@ const generalRoutes = express.Router();
  */
 
 generalRoutes.get('/', AppController.home);
-generalRoutes.get('/play', AppController.play);
 generalRoutes.post('/register', AppController.register_user);
 generalRoutes.post('/login', AppController.login);
 

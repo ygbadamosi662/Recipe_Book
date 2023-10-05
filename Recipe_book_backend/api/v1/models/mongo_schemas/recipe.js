@@ -1,6 +1,6 @@
 const { Schema } = require('mongoose');
 const { User_str } = require('../../global_constants');
-const { Permit } = require('../../enum_ish');
+const { Permit, Type } = require('../../enum_ish');
 const recipeSchema = new Schema({
   name: {
     type: String,
@@ -17,6 +17,7 @@ const recipeSchema = new Schema({
     type: [String],
     default: []
   },
+  description: String,
   user: {
     type: Schema.Types.ObjectId,
     ref: User_str,
@@ -27,7 +28,14 @@ const recipeSchema = new Schema({
     enum: Object.values(Permit),
     default: Permit.public,
   },
-  type: String,
+  fave_count: { 
+    type: Number,
+    default: 0,
+  },
+  type: { 
+    type: String,
+    default: Type.food,
+  },
 }, { timestamps: true });
 
 recipeSchema.pre('validate', function (next) {

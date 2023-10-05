@@ -123,7 +123,7 @@ class AppController {
         });
       }
 
-      const token = jwt_service.generate_token({email: value.email});
+      const token = jwt_service.generate_token({email: value.email, role: user.role});
 
       return response
         .status(200)
@@ -183,39 +183,39 @@ class AppController {
     }
   }
 
-  static async play(request, response) {
-    try {
-      const recipe_repo = db_storage.get_a_repo('Recipe');
+//   static async play(request, response) {
+//     try {
+//       const recipe_repo = db_storage.get_a_repo('Recipe');
       
-      const recipes_promise = Promise.all([
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
-      ])
-      const start = new Date().getTime();
-      const recipes = await recipes_promise;
-      const end = new Date().getTime();
-      console.log(end - start, 'exec time for promise', `ends ${end}`);
+//       const recipes_promise = Promise.all([
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+//       ])
+//       const start = new Date().getTime();
+//       const recipes = await recipes_promise;
+//       const end = new Date().getTime();
+//       console.log(end - start, 'exec time for promise', `ends ${end}`);
 
-      return response.status(201).json(recipes);
-    } catch (error) {
-      const err = new Date().getTime();
-      console.log(error, 'err caught now', err);
-      return response.status(400).json({ message: 'Bad Request' });
-    }
+//       return response.status(201).json(recipes);
+//     } catch (error) {
+//       const err = new Date().getTime();
+//       console.log(error, 'err caught now', err);
+//       return response.status(400).json({ message: 'Bad Request' });
+//     }
     
-  }
+//   }
 }
 
 module.exports = AppController;

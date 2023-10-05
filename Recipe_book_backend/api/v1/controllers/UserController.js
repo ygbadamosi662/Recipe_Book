@@ -1,10 +1,10 @@
 const util = require('../util');
 const { user_repo, User } = require('../repos/user_repo');
 const { Recipe, recipe_repo } = require('../repos/recipe_repo');
+const { review_repo, Review } = require('../repos/review_repo');
 const MongooseError = require('mongoose').Error;
 const JsonWebTokenErro = require('jsonwebtoken').JsonWebTokenError;
 const Joi = require('joi');
-const { db_storage } = require('../models/engine/db_storage');
 const { Permit } = require('../enum_ish');
 /**
  * Contains the UserController class 
@@ -44,6 +44,8 @@ class UserController {
         guide: Joi
           .array()
           .items(Joi.string()),
+        description: Joi
+          .string(),
         inspiration: Joi.string(),
         type: Joi
           .string()
@@ -60,23 +62,25 @@ class UserController {
       if (error) {
         throw error;
       }
-
-      const some_task = Promise.all([
-        Recipe.exists({name: value.name}),
-        user_repo.findByEmail(req.user.email, ['id'])
-      ]);
-
-      const results = await some_task;
-      if (results[0]) {
+      const user = await user_repo.findByEmail(req.user.email);
+      const rec_exists = await Recipe.exists({name: value.name, user: user});
+      
+      // if recipe already created by user
+      if (rec_exists) {
         return res
           .status(400)
           .json({
             message: `Invalid request, you already created a ${value.name} Recipe, update it if you want`,
           })
       }
-      value.user = results[1];
+      value.user = user;
+      
       const recipe = await Recipe
         .create(value);
+      
+      user.recipes.push(recipe);
+      user.save();
+      recipe.user = recipe.user.id;
       return res
         .status(200)
         .json({
@@ -114,6 +118,8 @@ class UserController {
           .items(Joi.string()),
         inspiration: Joi
           .string(),
+        description: Joi
+          .string(),
         type: Joi
           .string(),
         permit: Joi
@@ -148,8 +154,7 @@ class UserController {
       return res
         .status(200)
         .json({
-          message: `Recipe ${value.id} successfully updated`,
-          result,
+          message: `Recipe ${result.id} successfully updated`,
         });
     } catch (error) {
       
@@ -171,6 +176,14 @@ class UserController {
       if (!req.params.id) { return res.status(400).json({ msg: 'id is required'}); }
       const recipe = await Recipe.findById(req.params.id).exec();
 
+      if (!recipe) {
+        return res
+          .status(401)
+          .json({
+            msg: 'Invalid Request, recipe does not exist',
+          });
+      }
+
       if (recipe.permit === Permit.private) {
         const user = await user_repo.findByEmail(req.user.email, ['id']);
         if (user.id !== recipe.user) {
@@ -178,7 +191,7 @@ class UserController {
             .status(401)
             .json({
               msg: 'Invalid Request, Recipe is private',
-            })
+            });
         }
       }
 
@@ -332,6 +345,251 @@ class UserController {
         .status(200)
         .json({
           recipes: recs,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
+  // static async update_user() {
+  //   try {
+  //     const schema = Joi.object({
+  //       fname: Joi
+  //         .string(),
+  //       lname: Joi
+  //         .string(),
+  //       phone: Joi
+  //         .string()
+  //         .pattern(/^[8792][01]\d{8}$/),
+  //       email: Joi
+  //         .string()
+  //         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+  //       password: Joi
+  //         .string()
+  //         .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/),
+  //     });
+
+  //   // validate body
+  //   const { value, error } = schema.validate(req.body);
+    
+  //   if (error) {
+  //     throw error;
+  //   }
+  //   } catch (error) {
+      
+  //     if (error instanceof MongooseError) {
+  //       console.log('We have a mongoose problem', error.message);
+  //       res.status(500).json({error: error.message});
+  //     }
+  //     if (error instanceof JsonWebTokenErro) {
+  //       console.log('We have a jwt problem', error.message);
+  //       res.status(500).json({error: error.message});
+  //     }
+  //     console.log(error);
+  //     res.status(500).json({error: error.message});
+  //   }
+  // }
+
+  static async fave_recipe(req, res) {
+    try {
+      if (!req.params.id) {
+        return res
+          .status(400)
+          .json({
+            message: 'Invalid Request recipe id is required',
+          })
+      }
+
+      const rec_pr = Recipe.findById(req.params.id);
+      const user_pr = user_repo.findByEmail(req.user.email);
+
+      // faved
+      const rec = await rec_pr;
+      const user = await user_pr;
+
+      // checks if user has faved the recipe b$
+      if(user.faves.includes(rec.id)) {
+        return res
+          .status(200)
+          .json({
+            message: `Recipe with ${rec.id} is already a fave for the user`
+          });
+      }
+      rec.fave_count = rec.fave_count + 1;
+      rec.save();
+      
+      user.faves.push(rec);
+      user.save();
+
+      return res
+        .status(200)
+        .json({
+          message: `user faved ${rec.name} recipe`,
+        });
+      
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
+  static async review_recipe(req, res) {
+    try {
+      const schema = Joi.object({
+        id: Joi
+          .string()
+          .required(),
+        comment: Joi
+          .string(),
+        stars: Joi
+          .number()
+          .integer()
+          .required(),
+      });
+
+      // validate body
+      const { value, error } = schema.validate(req.body);
+      
+      if (error) {
+        throw error;
+      }
+
+      // check if recipe exists
+      const rec = await Recipe.findById(value.id);
+      if(!rec) {
+        return res
+          .status(201)
+          .json({
+            message: 'Invalid Request, recipe does not exist',
+          });
+      }
+
+      const user_pr = user_repo.findByEmail(req.user.email);
+      delete value.id;
+
+      // updates review
+      value['recipe'] = rec;
+      value['user'] = await user_pr;
+
+      const rev = await Review.create(value);
+      rev.user = rev.user.id;
+      rev.recipe = rev.recipe.id;
+
+      return res
+        .status(201)
+        .json({
+          message: 'Review created successfully',
+          review: rev
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
+  static async get_recipe_reviews(req, res) {
+    try {
+      if (!req.params.id) {
+        return res
+          .status(401)
+          .json({
+            error: 'Invalid Request, id is required',
+          });
+      }
+
+      const rec = await Recipe.findById(req.params.id);
+      if(!rec) {
+        return res
+          .status(401)
+          .json({
+            error: 'Invalid Request, recipe does not exist',
+          });
+      }
+
+      const revs = await Review
+        .find({
+          recipe: rec,
+        })
+        .sort({ stars: 1 })
+        .exec();
+
+      return res
+        .status(200)
+        .json({
+          reviews: revs.map((rev) => {
+            rev.user = rev.user.id;
+            rev.recipe = rev.recipe.id;
+            return rev;
+          }),
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
+  static async get_review(req, res) {
+    try {
+      if (!req.params.id) {
+        return res
+          .status(401)
+          .json({
+            error: 'Invalid Request, id is required',
+          });
+      }
+      const rev = await Review
+        .findById(req.params.id);
+      if(!rev) {
+        return res
+          .status(401)
+          .json({
+            error: 'Invalid Request, review does not exist',
+          });
+      }
+
+      rev.user = rev.user.id;
+      rev.recipe = rev.recipe.id;
+      return res
+        .status(200)
+        .json({
+          review: await rev,
         });
     } catch (error) {
       

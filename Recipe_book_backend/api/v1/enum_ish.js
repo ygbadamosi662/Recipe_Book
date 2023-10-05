@@ -9,6 +9,7 @@ const Type = {
     pizza: 'PIZZA',
     snacks: 'SNACKS',
     rice: 'RICE',
+    food: 'FOOD',
 };
 const Permit = {
     private: 'PRIVATE',
