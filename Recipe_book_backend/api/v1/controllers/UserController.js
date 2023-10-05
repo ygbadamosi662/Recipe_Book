@@ -1,6 +1,6 @@
 const util = require('../util');
-const { user_repo } = require('../repos/user_repo');
-const { Recipe } = require('../repos/recipe_repo');
+const { user_repo, User } = require('../repos/user_repo');
+const { Recipe, recipe_repo } = require('../repos/recipe_repo');
 const MongooseError = require('mongoose').Error;
 const JsonWebTokenErro = require('jsonwebtoken').JsonWebTokenError;
 const Joi = require('joi');
@@ -186,6 +186,152 @@ class UserController {
         .status(200)
         .json({
           recipe: recipe,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
+  static async get_recipes(req, res) {
+    try {
+      const schema = Joi.object({
+        name: Joi
+          .string(),
+        ingredients: Joi
+          .array()
+          .items(Joi.string()),
+        guide: Joi
+          .array()
+          .items(Joi.string()),
+        type: Joi
+          .string(),
+        page: Joi
+          .number()
+          .integer(),
+        size: Joi
+          .number()
+          .integer()
+      });
+
+      // validate body
+      const { value, error } = schema.validate(req.body);
+      if (error) {
+        throw error;
+      }
+      const user_promise = user_repo.findByEmail(req.user.email);
+
+      // get the set fields
+      let filters_and_pageStuff = util.get_what_is_set(value);
+
+      if (filters_and_pageStuff['name']) {
+        // passing a regex
+        filters_and_pageStuff.name = new RegExp(`${filters_and_pageStuff['name']}`);
+      }
+
+      // recipe_repo.get_recs() handles the filtering and paging
+      const recs = await recipe_repo.get_recs(filters_and_pageStuff);
+      return res
+        .status(200)
+        .json({
+          recipes: recs
+            .filter(async (recipe) => {
+              if (recipe.permit === Permit.private) {
+                // filters out pivate recipes if user !== recipe.user
+                return await user_promise === recipe.user;
+              }
+              return true;
+            }),
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      res.status(500).json({error: error.message});
+    }
+  }
+
+  static async get_my_recipes(req, res) {
+    try {
+      const schema = Joi.object({
+        name: Joi
+          .string(),
+        ingredients: Joi
+          .array()
+          .items(Joi.string()),
+        guide: Joi
+          .array()
+          .items(Joi.string()),
+        type: Joi
+          .string(),
+        faves: Joi
+          .string(),
+        permit: Joi
+          .string()
+          .valid(...Object.values(Permit)),
+        page: Joi
+          .number()
+          .integer(),
+        size: Joi
+          .number()
+          .integer()
+      });
+
+      // validate body
+      const { value, error } = schema.validate(req.body);
+      
+      if (error) {
+        throw error;
+      }
+
+      if (value.faves === 'YES' ) {
+        const user = await User
+          .findOne({email: req.user.email})
+          .select('faves')
+          .populate('faves')
+          .exec();
+        
+        return res
+          .status(200)
+          .json({
+            faves: user.faves,
+          });
+
+      }
+      const user_promise = User
+        .findOne({email: req.user.email})
+        .select('id');
+
+      let filters_and_pageStuff = util.get_what_is_set(value);
+      if (filters_and_pageStuff['name']) {
+        filters_and_pageStuff.name = new RegExp(`${filters_and_pageStuff['name']}`);
+      }
+
+      filters_and_pageStuff.user = await user_promise;
+
+      const recs = await recipe_repo.get_recs(filters_and_pageStuff);
+
+      // const recs = await 
+      return res
+        .status(200)
+        .json({
+          recipes: recs,
         });
     } catch (error) {
       

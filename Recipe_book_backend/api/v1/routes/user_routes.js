@@ -13,6 +13,8 @@ const userRoutes = express.Router();
 userRoutes.get('/get_user', UserController.get_user);
 userRoutes.post('/recipe/create', UserController.create_recipe);
 userRoutes.post('/recipe/update', UserController.update_recipe);
+userRoutes.post('/recipe/get/recipes', UserController.get_recipes);
+userRoutes.post('/recipe/get/recipes/mine', UserController.get_my_recipes);
 userRoutes.get('/recipe/get/:id', UserController.get_recipe);
 
 

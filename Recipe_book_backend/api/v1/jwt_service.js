@@ -30,24 +30,27 @@ class JwtService {
 const authenticate_token = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Extract the token part
+
+  // if token is absent
   if (!token) {
     return res
       .status(401)
       .json({
-        message: 'No auth token',
+        message: 'Invalid Request',
       });
   }
   try {
+    // if token has logged out
     const jwt = await db_storage.get_jwt(token);
     if (jwt) {
       return res
       .status(400)
-      .json({ message: 'Invalid token, User should log in again' });
+      .json({ message: 'Invalid Request, User should log in again' });
     }
   } catch (error) {
     console.log('FS error', error);
   }
-  
+  // if token is valid
   jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
     if (err) {
       return res.status(401); // Forbidden

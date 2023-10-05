@@ -191,6 +191,17 @@ class AppController {
         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
         recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
+        recipe_repo.create({name: 'Youyou', ingredients: ['ponmo', 'rice']}),
       ])
       const start = new Date().getTime();
       const recipes = await recipes_promise;
