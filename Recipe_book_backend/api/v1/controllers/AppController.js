@@ -6,7 +6,7 @@
 const { user_repo } = require('../repos/user_repo');
 const { db_storage } = require('../models/engine/db_storage')
 const util = require('../util');
-const { jwt_service } = require('../jwt_service');
+const { jwt_service } = require('../services/jwt_service');
 const Joi = require('joi');
 const { Role } = require('../enum_ish')
 const mongoose = require('mongoose');
@@ -76,8 +76,6 @@ class AppController {
     user.password = await util.encrypt_pwd(value.password);
 
     const resoled_u = await user_repo.create_user(user);
-    console.log(user)
-
     return response
       .status(201)
       .json({user: resoled_u});
@@ -85,16 +83,16 @@ class AppController {
 
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
-        response.status(500).json({error: error.message});
+        return response.status(500).json({error: error.message});
       }
       if (error instanceof Joi.ValidationError) {
-        response.status(400).json({
+        return response.status(400).json({
           error: 'Invalid request body',
           errors: error.details,
         });
       }
       console.log(error);
-      res.status(500).json({error: error.message});
+      return res.status(500).json({error: error.message});
     }
   }
 
@@ -123,7 +121,7 @@ class AppController {
         });
       }
 
-      const token = jwt_service.generate_token({email: value.email, role: user.role});
+      const token = await jwt_service.generate_token({email: value.email, role: user.role});
 
       return response
         .status(200)
@@ -146,7 +144,7 @@ class AppController {
             errors: error.details,
           });
       }
-      console.log(error);
+      return console.log(error);
       res.status(500).json({error: error.message});
     }
   }
@@ -179,7 +177,7 @@ class AppController {
         return res.status(500).json({error: error.message});
       }
       console.log(error);
-      response.status(500).json({error: error.message});
+      return response.status(500).json({error: error.message});
     }
   }
 

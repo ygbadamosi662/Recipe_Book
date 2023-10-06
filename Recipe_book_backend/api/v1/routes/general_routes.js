@@ -1,6 +1,4 @@
 const AppController = require("../controllers/AppController.js");
-const UserController = require('../controllers/UserController.js');
-const { auth_token } = require('../jwt_service.js');
 const express = require('express');
 
 const generalRoutes = express.Router();

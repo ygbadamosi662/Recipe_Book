@@ -1,7 +1,7 @@
 process.traceProcessWarnings = true;
 const { generalRoutes } = require('./routes/general_routes.js');
 const { authRoutes } = require('./routes/auth_routes.js');
-const { authenticate_token } = require('./jwt_service.js');
+const { authenticate_token } = require('./services/jwt_service.js');
 const express = require('express');
 const cors = require('cors');
 const gracefulShutdown = require('express-graceful-shutdown');

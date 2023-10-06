@@ -9,6 +9,7 @@ class UserRepo {
   constructor () {
     try {
       this._repo = db_storage.get_a_repo(User_str);
+      this._conn = db_storage.conn;
     } catch (error) {
       throw error;
     }
@@ -17,6 +18,10 @@ class UserRepo {
 
   get repo() {
     return this._repo;
+  }
+
+  get conn() {
+    return this._conn;
   }
 
   async findByEmail(email, select=[]) {

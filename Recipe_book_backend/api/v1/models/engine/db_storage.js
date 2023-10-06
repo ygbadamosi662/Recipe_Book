@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const userSchema = require('../mongo_schemas/user');
 const recipeSchema = require('../mongo_schemas/recipe');
+const notificationSchema = require('../mongo_schemas/notification');
 const reviewSchema = require('../mongo_schemas/review');
-const { Recipe_str, User_str, Review_str } = require('../../global_constants');
+const { Recipe_str, User_str, Review_str, Notification_str } = require('../../global_constants');
 const fs = require('fs').promises;
 const path = require('path');
 require('dotenv').config();
@@ -41,6 +42,10 @@ class DbStorage {
     this._mongo_db = value;
   }
 
+  get conn() {
+    return this._conn;
+  }
+
   get_a_repo (key) {
     if (key in this.mongo_repos) {
       return this.mongo_repos[key]; 
@@ -66,11 +71,13 @@ class DbStorage {
       const User = this._conn.model(User_str, userSchema);
       const Recipe = this._conn.model(Recipe_str, recipeSchema);
       const Review = this._conn.model(Review_str, reviewSchema);
+      const Notification = this._conn.model(Notification_str, notificationSchema);
 
       // collect repos
       this.mongo_repos.User = User;
       this.mongo_repos.Recipe = Recipe;
       this.mongo_repos.Review = Review;
+      this.mongo_repos.Notification = Notification;
 
     } catch (error) {
       throw error;
@@ -121,4 +128,4 @@ class DbStorage {
 const db_storage = new DbStorage();
 db_storage.reload();
 
-module.exports = { db_storage };
+module.exports = { db_storage, Connection: db_storage.conn };

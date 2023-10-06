@@ -1,8 +1,6 @@
 const UserController = require('../controllers/UserController.js');
 const express = require('express');
-
 const userRoutes = express.Router();
-
 /**
  * Binds the routes to the appropriate handler in the
  * given Express application.
@@ -20,6 +18,10 @@ userRoutes.get('/recipe/get/reviews/:id', UserController.get_recipe_reviews);
 userRoutes.get('/recipe/fave/:id', UserController.fave_recipe);
 userRoutes.post('/recipe/review', UserController.review_recipe);
 userRoutes.get('/review/:id', UserController.get_review);
+userRoutes.post('/notification/notifications', UserController.get_notifications);
+userRoutes.get('/notification/:id', UserController.get_notification);
+userRoutes.post('/FollowUnfollow', UserController.follow_unfollow);
+userRoutes.post('/FollowUnfollow/get', UserController.get_followers_and_following);
 
 
 

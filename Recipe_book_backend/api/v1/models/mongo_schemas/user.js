@@ -1,7 +1,7 @@
 const validator = require('validator');
 const { Schema } = require('mongoose');
 const { Role } = require('../../enum_ish');
-const { Recipe_str } = require('../../global_constants');
+const { Recipe_str, User_str } = require('../../global_constants');
 
 const userSchema = new Schema({
   name: { 
@@ -50,6 +50,16 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+  },
+  following: {
+    type: [Schema.Types.ObjectId],
+    ref: User_str,
+    default: [],
+  },
+  followers: {
+    type: [Schema.Types.ObjectId],
+    ref: User_str,
+    default: [],
   },
   role: {
     type: String,

@@ -16,4 +16,15 @@ const Permit = {
     public: 'PUBLIC',
 };
 
-module.exports = { Role, Type, Permit }
+const Status = {
+    sent: 'SENT',
+    received: 'RECEIVED',
+    read: 'READ',
+}
+
+const Which = {
+    following: 'following',
+    followers: 'followers',
+}
+
+module.exports = { Role, Type, Permit, Status, Which };
