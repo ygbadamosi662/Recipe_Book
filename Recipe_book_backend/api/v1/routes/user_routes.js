@@ -8,7 +8,8 @@ const userRoutes = express.Router();
  * @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
  */
 
-userRoutes.get('/get_user', UserController.get_user);
+userRoutes.get('/get/:id', UserController.get_user);
+userRoutes.post('/update', UserController.update_user);
 userRoutes.post('/recipe/create', UserController.create_recipe);
 userRoutes.post('/recipe/update', UserController.update_recipe);
 userRoutes.post('/recipe/get/recipes', UserController.get_recipes);

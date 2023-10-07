@@ -67,21 +67,6 @@ class UserRepo {
       throw error;
     }
   }
-
-  // async create_user_too(user) {
-  //   if (!user) { return };
-  //   try {
-      
-  //     const User = db_storage.get_a_repo(User_str)
-  //     console.log('Here', User, this._repo);
-  //     const user_u = await this._repo.create(user);
-      
-  //     console.log(user_u, 'user')
-  //     return user_u;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 }
 
 const user_repo = new UserRepo();

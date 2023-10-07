@@ -47,7 +47,6 @@ class ReviewRepo {
       .exec();
     return recs;
   }
-
 }
 
 const review_repo = new ReviewRepo();

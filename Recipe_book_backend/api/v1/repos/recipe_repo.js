@@ -47,7 +47,7 @@ class RecipeRepo {
     if (obj['guide']) {
       obj.guide = { $in: obj['guide']};
     }
-    console.log(obj)
+
     const recs =  await this._repo
       .find(obj)
       .skip((page - 1) * PAGE_SIZE)

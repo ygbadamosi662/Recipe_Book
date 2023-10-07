@@ -19,8 +19,20 @@ const notification_repo = require('../repos/notification_repo');
 class UserController {
   static async get_user(req, res) {
     try {
-      const user = await user_repo.findByEmail(req.user.email);
-      return res.status(200).json(user);
+      if(!req.params.id) {
+        return res
+          .status(400)
+          .json({ error: 'Bad request, id is required'});
+      }
+      const user = await User.findById(req.params.id);
+      if(!user) {
+        return res
+          .status(400)
+          .json({ message: 'User does not exist'})
+      }
+      return res
+        .status(200)
+        .json({ user: user});
     } catch (error) {
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
@@ -151,14 +163,37 @@ class UserController {
         throw error;
       }
 
-      const exist_promise = Recipe.exists({ id: value.id });
+      const fields = [
+        'name',
+        'ingredients',
+        'guide',
+        'inspiration',
+        'description',
+        'type',
+        'permit',
+      ];
+      
+      const just_checking = () => {
+        const objectEntries = Object.entries(value);
 
-      // get set values
-      const update_data = util.get_what_is_set(value, ['id']);
+        for (const [key, value] of objectEntries) {
+          if (fields.includes(key)) {
+            return true;
+          }
+        }
+        return false;
+      }
 
+      // checks if any other field aside id is set
+      if (!just_checking()) {
+        return res
+          .status(400)
+          .json({ message: 'No data provided for update'});
+      }
+
+      const rec = await Recipe.findById(value.id);
       // validate recipe
-      const exists = await exist_promise;
-      if (exists === false) {
+      if (!rec) {
         return res
           .status(400)
           .json({
@@ -167,25 +202,28 @@ class UserController {
       }
 
       const user_pr = User.findOne({email: req.user.email})
-                       .populate('followers')
-                       .exec();
+        .populate('followers')
+        .exec();
 
-      const result_pr = Recipe.updateOne({ id: value.id }, update_data);
+      // delete id 
+      delete value.id;
+      
       let result = {};
       const user = await user_pr;
+
       await Connection.transaction(async () => {
-          result = await result_pr;
           if (user.followers) {
             // notify followers
             const comment = `${user.name.aka ? user.name.aka : [user.name.fname, user.name.lname].join(' ')} just updated a recipe`;
-            await notification_service.notify_all(user.followers, comment, result);
+            result = await Recipe.updateOne({ id: value.id }, value);
+            await notification_service.notify_all(user.followers, comment, rec.id);
           }
         })
 
       return res
         .status(200)
         .json({
-          message: `Recipe ${result.id} successfully updated`,
+          message: `Recipe ${rec.id} successfully updated`,
         });
     } catch (error) {
       
@@ -273,28 +311,35 @@ class UserController {
         throw error;
       }
 
-      const user_promise = User
-                            .findOne({ email: req.user.email})
-                            .exec();
-
-      // get the set fields
-      let filters_and_pageStuff = util.get_what_is_set(value);
-
-      if (filters_and_pageStuff['name']) {
-        // passing a regex
-        filters_and_pageStuff.name = new RegExp(`${filters_and_pageStuff['name']}`);
+      if (!value) {
+        return res
+          .status(400)
+          .json({ message: 'Bad request, no data provided'});
       }
 
-      // recipe_repo.get_recs() handles the filtering and paging
-      const recs = await recipe_repo.get_recs(filters_and_pageStuff);
+      const user_promise = User
+        .findOne({ email: req.user.email})
+        .exec();
+
+      if (value['name']) {
+        // passing a regex
+        value.name = new RegExp(`${value['name']}`);
+      }
+
+      const recs = await recipe_repo.get_recs(value);
       const user = await user_promise;
       return res
         .status(200)
         .json({
           recipes: recs
-            .filter((recipe) => {
-              if ((recipe.permit === Permit.private) && !recipe.user.followers.includes(user.id)) {
-                // filters out pivate recipes if user !== recipe.user
+            .filter( async (recipe) => {
+              // user not a follower
+              if ((recipe.permit === Permit.private)) {
+                const recipe_owner = await User.findById(recipe.user);
+                if(recipe_owner.followers.includes(user.id)) {
+                  return true
+                }
+                // filters out pivate recipes if user !== recipe.user 
                 return user === recipe.user;
               }
               return true;
@@ -351,6 +396,34 @@ class UserController {
         throw error;
       }
 
+      const fields = [
+        'name',
+        'ingredients',
+        'guide',
+        'inspiration',
+        'description',
+        'type',
+        'permit',
+      ];
+
+      const just_checking = () => {
+        const objectEntries = Object.entries(value);
+
+        for (const [key, value] of objectEntries) {
+          if (fields.includes(key)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // checks if any other field aside 
+      if (!just_checking()) {
+        return res
+          .status(400)
+          .json({ message: 'No data provided'});
+      }
+
       if (value.faves === 'YES' ) {
         const user = await User
           .findOne({email: req.user.email})
@@ -372,8 +445,14 @@ class UserController {
 
       // if count is true, consumer just wants a count of the filtered documents
       if (value.count) {
-        let filters = util.get_what_is_set(value, ['count', 'page', 'size']);
-        filters.name = new RegExp(`${filters_and_pageStuff['name']}`);
+        let filters = value;
+        delete filters.count;
+        delete filters.page;
+        delete filters.size;
+
+        if (filters.name) {
+          filters.name = new RegExp(`${filters.name}`);
+        }
         filters.user = await user_promise;
         const count = await Recipe.countDocuments(filters);
 
@@ -384,7 +463,7 @@ class UserController {
             });
       }
 
-      let filters_and_pageStuff = util.get_what_is_set(value);
+      let filters_and_pageStuff = value;
       if (filters_and_pageStuff['name']) {
         filters_and_pageStuff.name = new RegExp(`${filters_and_pageStuff['name']}`);
       }
@@ -414,44 +493,123 @@ class UserController {
     }
   }
 
-  // static async update_user() {
-  //   try {
-  //     const schema = Joi.object({
-  //       fname: Joi
-  //         .string(),
-  //       lname: Joi
-  //         .string(),
-  //       phone: Joi
-  //         .string()
-  //         .pattern(/^[8792][01]\d{8}$/),
-  //       email: Joi
-  //         .string()
-  //         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-  //       password: Joi
-  //         .string()
-  //         .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/),
-  //     });
+  static async update_user(req, res) {
+    try {
+      const schema = Joi.object({
+        fname: Joi
+          .string(),
+        lname: Joi
+          .string(),
+        aka: Joi
+          .string(),
+        dob: Joi
+          .date(),
+        phone: Joi.object({
+            new_phone: Joi
+              .string()
+              .pattern(/^[8792][01]\d{8}$/)
+              .required(),
+            password: Joi
+              .string()
+              .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/)
+              .required(),
+          }),
+        email: Joi.object({
+            new_email: Joi
+              .string()
+              .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+              .required(),
+            password: Joi
+              .string()
+              .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/)
+              .required(),
+          }),
+        password: Joi.object({
+            new_password: Joi
+              .string()
+              .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/)
+              .required(),
+            old_password: Joi
+              .string()
+              .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/)
+              .required(),
+          }),
+      });
 
-  //   // validate body
-  //   const { value, error } = schema.validate(req.body);
-    
-  //   if (error) {
-  //     throw error;
-  //   }
-  //   } catch (error) {
+      // validate body
+      const { value, error } = schema.validate(req.body);
+      if (error) {
+        throw error;
+      }
+
+      // if no value is set
+      if(!value) {
+        return res
+          .status(400)
+          .json({ message: 'No data provided'});
+      }
+
+      const user = await user_repo.findByEmail(req.user.email);
+
+      // validates password for updating sensitive data
+      if (value.email || value.phone || value.password) {
+        if (value.email) {
+          if(await util.validate_pwd(value.email.password, user.password)) {
+            user.email = value.email.new_email;
+          } else {
+            return res
+              .status(400)
+              .json({ Message: 'Invalid Credentials'})
+          }
+        }
+        if (value.phone) {
+          if(await util.validate_pwd(value.phone.password, user.password)) {
+            user.phone = value.phone.new_phone;
+          } else {
+            return res
+              .status(400)
+              .json({ Message: 'Invalid Credentials'})
+          }
+        }
+        if (value.password) {
+          if(await util.validate_pwd(value.password.old_password, user.password)) {
+            user.password = await util.encrypt_pwd(value.password.new_password);
+          } else {
+            return res
+              .status(400)
+              .json({ Message: 'Invalid Credentials'})
+          }
+        }
+      }
+
+      if(value.fname) { user.name.fname = value.fname; }
+      if(value.lname) { user.name.lname = value.lname; }
+      if(value.dob) { user.dob = value.dob; }
+      if(value.aka) { user.name.aka = value.aka; }
+
+      user.save();
+
+      return res
+        .status(200)
+        .json({ 
+          Message: 'User succesfully updated',
+          user: user.id,
+        });
+
+    } catch (error) {
       
-  //     if (error instanceof MongooseError) {
-  //       console.log('We have a mongoose problem', error.message);
-  //       res.status(500).json({error: error.message});
-  //     }
-  //     if (error instanceof JsonWebTokenErro) {
-  //       console.log('We have a jwt problem', error.message);
-  //       res.status(500).json({error: error.message});
-  //     }
-  //     console.log(error);
-  //     res.status(500).json({error: error.message});
-  //   }
-  // }
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
 
   static async fave_recipe(req, res) {
     try {
@@ -557,11 +715,12 @@ class UserController {
       value['user'] = await user_pr;
 
       
-      // notify owner
-      const comment = `${rev.user.name.aka ? rev.user.name.aka : rev.user.name.fname + ' ' + rev.user.name.lname} wrote a review for your recipe`;
+      
       let rev = {};
       Connection.transaction(async () => {
+          // notify owner
           rev = await Review.create(value);
+          const comment = `${value['user'].name.aka ? value['user'].name.aka : value['user'].name.fname + ' ' + value['user'].name.lname} wrote a review for your recipe`;
           await notification_service
             .notify({
               comment: comment,
@@ -570,8 +729,8 @@ class UserController {
             });
         })
 
-      rev.user = rev.user.id;
-      rev.recipe = rev.recipe.id;
+      rev.user = value['user'].id;
+      rev.recipe = value['recipe'].id;
 
       return res
         .status(201)
@@ -600,6 +759,9 @@ class UserController {
         recipe_id: Joi
           .string()
           .required(),
+        count: Joi
+          .boolean()
+          .required(),
         stars: Joi
           .array()
           .items(Joi.string()),
@@ -619,6 +781,31 @@ class UserController {
         throw error;
       }
 
+      const fields = [
+        'stars',
+        'comment',
+        'page',
+        'size',
+      ];
+
+      const just_checking = () => {
+        const objectEntries = Object.entries(value);
+
+        for (const [key, value] of objectEntries) {
+          if (fields.includes(key)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // checks if any other field aside 
+      if (!just_checking()) {
+        return res
+          .status(400)
+          .json({ message: 'No data provided'});
+      }
+
       // validates recipe
       const rec = await Recipe.findById(value.recipe_id);
       if(!rec) {
@@ -629,7 +816,25 @@ class UserController {
           });
       }
 
-      let filters_and_pageStuff = util.get_what_is_set(value, ['recipe_id']);
+      // if count is true, consumer just wants a count of the filtered documents
+      if (value.count) {
+        let filters = value;
+        if (filters.comment) {
+          filters.comment = new RegExp(`${filters_and_pageStuff['comment']}`);
+        }
+        filters.recipe = rec;
+        const count = await Recipe.countDocuments(filters);
+
+        return res
+            .status(200)
+            .json({
+              count: count,
+            });
+      }
+
+      let filters_and_pageStuff = value;
+      delete filters_and_pageStuff.recipe_id;
+      filters_and_pageStuff.recipe = rec;
       
       if (filters_and_pageStuff['comment']) {
         filters_and_pageStuff.comment = new RegExp(`${filters_and_pageStuff['comment']}`);
@@ -732,23 +937,45 @@ class UserController {
         throw error;
       }
 
-      const user_pr = user_repo.findByEmail(req.user.email, ['id']);
+      const fields = [
+        'comment',
+        'status',
+        'page',
+        'size',
+      ];
 
-      // get whats set
-      let filter_and_pageStuff = util.get_what_is_set(value, ['count']);
+      const just_checking = () => {
+        const objectEntries = Object.entries(value);
+
+        for (const [key, value] of objectEntries) {
+          if (fields.includes(key)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // checks if any other field aside 
+      if (!just_checking()) {
+        return res
+          .status(400)
+          .json({ message: 'No data provided'});
+      }
+
+      const user_pr = user_repo.findByEmail(req.user.email, ['id']);
 
       // if count is true, consumer just wants a count of the filtered documents
       if (value.count) {
         const count = await Notification
-                        .countDocuments({ 
-                          status: filter_and_pageStuff.status,
-                          to: await user_pr
-                        });
+          .countDocuments({ 
+            status: value.status,
+            to: await user_pr
+          });
 
         return res
             .status(200)
             .json({
-              status: filter_and_pageStuff.status,
+              status: value.status,
               count: count,
             });
       }
@@ -756,11 +983,11 @@ class UserController {
       // get notifications
       const notes = await Notification
         .find({ 
-          status: filter_and_pageStuff.status,
+          status: value.status,
           to: await user_pr,
          })
-        .skip((filter_and_pageStuff.page - 1) * filter_and_pageStuff.size)
-        .limit(filter_and_pageStuff.size)
+        .skip((value.page - 1) * value.size)
+        .limit(value.size)
         .sort({ createdAt: -1 })
         .exec();
 
@@ -1024,7 +1251,6 @@ class UserController {
       return res.status(500).json({error: error.message});
     }
   }
-
 }
   
 module.exports = UserController;
