@@ -47,6 +47,33 @@ class ReviewRepo {
       .exec();
     return recs;
   }
+
+  async has_next_page(filter, page=1, page_size=this._page_size) {
+    try {
+      const totalCount = await this._repo
+        .countDocuments(filter)
+        .exec();
+
+      const totalPages = Math.floor(totalCount / page_size);
+      const hasNextPage = page < totalPages;
+
+      return hasNextPage;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async total_pages(filter, page_size=this._page_size) {
+    try {
+      const totalCount = await this._repo
+        .countDocuments(filter)
+        .exec();
+
+      return Math.floor(totalCount / page_size);;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 const review_repo = new ReviewRepo();

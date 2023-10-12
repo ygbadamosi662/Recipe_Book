@@ -47,15 +47,6 @@ class Utility {
       throw error;
     }
   }
-
-  // filter_content(arr_one=[], arr_two=[], property) {
-  //   if (!arr_one || !arr_two) { return }
-  //   return arr_one
-  //     .filter((value) => {
-  //       return arr_two.every((element) => value[property].includes(element));
-  //     });
-  // }
-  
 }
 
 const util = new Utility();
