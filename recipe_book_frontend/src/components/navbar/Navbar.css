@@ -26,22 +26,29 @@ header h1{
 	font-family: 'Times New Roman', Times, serif;
 	font-style: italic;
 }
-nav a {
+.nav a {
 	/* margin: 0 1rem; */
 	font-size: 1.5rem;
 	color: #000;
 	text-decoration: none;
+
+	cursor: pointer;
 }
-nav{
+.nav{
 	gap: 2rem;
-	margin-left: auto;
+	/* margin-left: auto; */
 }
 
-nav a:hover {
+.nav a:hover {
 	color: var(--textColor);
 }
 .active {
 	color: #0a810c;
+}
+
+.membership {
+	gap: 2rem;
+	width: 100%;
 }
 
 header .nav-btn {
@@ -57,7 +64,11 @@ header .nav-btn {
 	font-size: 1.8rem;
 }
 
-nav button{
+.nav-btn{
+	display: none;
+}
+
+.nav button { 
 	width: 9rem;
 	height: 3rem;
 	font-size: 1.5rem;
@@ -66,7 +77,7 @@ nav button{
 	cursor: pointer;
 }
 
-.sign-up{
+.sign-up {
 	display: flex;
 	justify-content: center;
 	/* text-align: center; */
@@ -77,18 +88,22 @@ nav button{
 	background-color: #023402;
 
 }
-nav button:hover {
+.nav button:hover {
 	color: #055306;
 }
 
 header div,
-nav {
+.nav {
 	display: flex;
 	align-items: center;
 }
 /* .login{
 	padding-left: rem;
 } */
+/* .red {
+	background-color: red;
+} */
+
 .greeting{
 	display: none;
 }
@@ -104,8 +119,8 @@ nav {
 	}
 	header {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		/* align-items: center; */
+		/* justify-content: space-between; */
 		height: 80px;
 		width: 100vw;
 		padding: 0 2rem;
@@ -113,7 +128,7 @@ nav {
 		position: fixed;
 		
 	}
-	header nav {
+	.nav {
 		position: fixed;
 		top: -100vh;
 		left: 0;
@@ -140,6 +155,10 @@ nav {
 		position: absolute;
 		top: 2rem;
 		right: 2rem;
+	}
+	
+	.nav-btn{
+		display: block;
 	}
 
 	nav a {

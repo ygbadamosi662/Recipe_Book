@@ -30,71 +30,58 @@ function Navbar() {
   return (
     <header>
       <h1>Recipe Book</h1>
-      <nav ref={navRef}>
-        {/* div component for nav links */}
+      {/* <nav ref={navRef}> */}
+      {/* div component for nav links */}
+      <div className="nav">
         <div
           //ternary operator to make the link active when you're on the page
-          className={({ isActive }) => (isActive ? "active" : "")}
+          className={` `}
           to=""
-          onClick={handleClick}>Home</div>
-
-        <div
-          className={({ isActive }) => (isActive ? "active" : "")}
           onClick={handleClick}
-          to="">
-          Recipe
+        >
+          <a href="">Home</a>
         </div>
-        <div
-          className={({ isActive }) => (isActive ? "active" : "")}
-          onClick={handleClick} to=""> 
-          Favorite
+
+        <div className={``} onClick={handleClick} to="">
+          <a href="">Recipe</a>
         </div>
-        {!auth && (
-          <>
-            <div
-              className={({ isActive }) => (isActive ? "active" : "")}
-              to=""
-              onClick={handleClick}
-            >
-              Sign In
+        <div className={``} onClick={handleClick} to="">
+          <a href="">Favorite</a>
+        </div>
+        {auth && (
+          <div className={``} to="" onClick={handleClick}>
+            <a href="">Recipe</a>
+          </div>
+        )}
+      </div>
+      <div className="nav">
+        {!auth ? (
+          <div className="membership">
+            <div className={``} to="" onClick={handleClick}>
+              <a href="">Sign In</a>
             </div>
             <button className="sign-up" onClick={handleClick}>
-              <div
-                className={({ isActive }) => (isActive ? "active" : "")}
-                to=""
-              >
+              <div className={``} to="">
                 Sign up
               </div>
             </button>
-          </>
-        )}
-        {/* display  apointment, logout and greeting when authenticated (logged in) & login and sign out when (logged out) */}
-        {auth && (
-          <>
-            <div
-              className={({ isActive }) => (isActive ? "active" : "")}
-              to=""
-              onClick={handleClick}
-            >
-              Profile
-            </div>
+          </div>
+        ) : (
+          <div className=" membership">
             <button className="logout" onClick={handleLogOut}>
-              <div
-                className={({ isActive }) => (isActive ? "active" : "")}
-                to=""
-                onClick={handleClick}
-              >
+              <div className={``} to="" onClick={handleClick}>
                 Log out
               </div>
             </button>
-          </>
+            <span className="greeting">Hi, {name}</span>
+          </div>
         )}
-        {auth && <span className="greeting">Hi, {name}</span>}
-        {/* button to close navbar on mobile */}
-        <button className="nav-btn nav-close-btn" onClick={showNavbar}>
+      </div>
+      {/* button to close navbar on mobile */}
+      {/* <button className="nav-btn nav-close-btn" onClick={showNavbar}>
           <FaTimes />
-        </button>
-      </nav>
+        </button> */}
+      {/* </nav> */}
       {/* display greeting when authenticated */}
       {auth && <span className="greeting1">Hi, {name}</span>}
 
