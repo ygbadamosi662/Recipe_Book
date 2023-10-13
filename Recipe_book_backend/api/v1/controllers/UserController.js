@@ -485,7 +485,7 @@ class UserController {
         delete filters.size;
 
         if (filters.name) {
-          filters.name = new RegExp(`${filters.name}`);
+          filters.name = new RegExp(filters.name);
         }
         filters.user = await user_promise;
         const count = await Recipe.countDocuments(filters);
