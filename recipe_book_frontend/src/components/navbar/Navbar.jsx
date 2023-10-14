@@ -28,7 +28,7 @@ function Navbar() {
   //used to display greetings on the navbar when user logged in
   const name = "Omolara";
   return (
-    <header>
+    <header className="relative">
       <h1>Recipe Book</h1>
       {/* <nav ref={navRef}> */}
       {/* div component for nav links */}
@@ -39,18 +39,18 @@ function Navbar() {
           to=""
           onClick={handleClick}
         >
-          <a href="">Home</a>
+          <a href="javascript:void(0)">Home</a>
         </div>
 
         <div className={``} onClick={handleClick} to="">
-          <a href="">Recipe</a>
+          <a href="javascript:void(0)">Recipe</a>
         </div>
         <div className={``} onClick={handleClick} to="">
-          <a href="">Favorite</a>
+          <a href="javascript:void(0)">Favorite</a>
         </div>
         {auth && (
           <div className={``} to="" onClick={handleClick}>
-            <a href="">Recipe</a>
+            <a href="javascript:void(0)">Recipe</a>
           </div>
         )}
       </div>
@@ -58,7 +58,7 @@ function Navbar() {
         {!auth ? (
           <div className="membership">
             <div className={``} to="" onClick={handleClick}>
-              <a href="">Sign In</a>
+              <a href="javascript:void(0)">Sign In</a>
             </div>
             <button className="sign-up" onClick={handleClick}>
               <div className={``} to="">
