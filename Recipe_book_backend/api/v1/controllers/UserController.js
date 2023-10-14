@@ -225,14 +225,13 @@ class UserController {
       // delete id 
       delete value.id;
       
-      let result = {};
       const user = await user_pr;
 
       await Connection.transaction(async () => {
           if (user.followers) {
             // notify followers
             const comment = `${user.name.aka ? user.name.aka : [user.name.fname, user.name.lname].join(' ')} just updated a recipe`;
-            result = await Recipe.updateOne({ id: value.id }, value);
+            await Recipe.updateOne({ id: value.id }, value);
             await notification_service.notify_all(user.followers, comment, rec.id);
           }
         })
@@ -640,7 +639,7 @@ class UserController {
       if(value.dob) { user.dob = value.dob; }
       if(value.aka) { user.name.aka = value.aka; }
 
-      user.save();
+      await user.save();
 
       return res
         .status(200)
@@ -690,21 +689,21 @@ class UserController {
           });
       }
       rec.fave_count = rec.fave_count + 1;
-      rec.save();
+      await rec.save();
       
       user.faves.push(rec);
     
       // notify owner
       const comment = `${user.name.aka ? user.name.aka : user.name.fname + ' ' + user.name.lname} just fave your recipe`;
       await Connection.transaction(async () => {
-          user.save();
-          await notification_service
-            .notify({
-              comment: comment,
-              to: user,
-              subject: rec,
-            });
-        });
+        await user.save();
+        await notification_service
+          .notify({
+            comment: comment,
+            to: user,
+            subject: rec,
+          });
+      });
       return res
         .status(200)
         .json({
@@ -1199,55 +1198,29 @@ class UserController {
 
         following.followers.push(follower);
         follower.following.push(following);
-        await Connection.transaction(async () => {
-              following.save();
-              follower.save();
+        await Connection
+          .transaction(async () => {
+              const result = await Promise.all([following.save(), follower.save()]);
               // notifies 
               await notification_service.notify({
                 to: following,
-                comment: `${follower.name.fname + ' ' + follower.name.lname} now follows you`,
-                subject: follower,
+                comment: `${result[0].name.fname + ' ' + result[1].name.lname} now follows you`,
+                subject: result[1],
               });
           });
 
         return res
           .status(200)
           .json({ 
-            message: `You are now following ${following.name.fname + ' ' + following.name.lname}`
+            message: `You are now following ${result[0].name.fname + ' ' + result[0].name.lname}`
           });
       }
-
-      // if user wants unfollow
-
-      // this checks if user is following already
-      if(!following.followers.includes(follower.id)) {
-        return res
-          .status(200)
-          .json({ message: `You are not following ${following.name.fname + ' ' + following.name.lname}` })
-      }
-      
-      following.followers = following.followers.filter((elem) => elem === follower.id);
-      follower.following = follower.following.filter((elem) => elem === following.id);
-
-      await user_repo.conn
-        .transaction(async () => {
-            following.save();
-            follower.save();
-            // notifies 
-            await notification_service.notify({
-              to: following,
-              comment: `${follower.name.fname + ' ' + follower.name.lname} unfollowed you`,
-              subject: follower,
-            });
-        });
 
       return res
         .status(200)
         .json({ 
           message: `You unfollwed ${following.name.fname + ' ' + following.name.lname}`
         });
-
-
     } catch (error) {
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
@@ -1350,14 +1323,41 @@ class UserController {
             msg: 'Bad request, recipe does not exist',
           });
       }
-      const user = await User.findById(recipe.user.toString());
 
+      await Connection
+        .transaction(async () => {
+          const user = await User.findById(recipe.user.toString());
+          // update user.recipes
+          user.recipes = user.recipes.filter((rec) => { return rec !== recipe._id});
+          user.save();
 
-      // update user.recipes
-      user.recipes = user.recipes.filter((rec) => { return rec !== recipe._id});
-      user.save();
+          await Recipe.deleteOne({ _id: recipe._id});
+          let favers = await User.find({
+            faves: { $in: [recipe._id] }
+          });
+          if(favers) {
+            let update_favers_tasks = [];
+            favers
+              .map((fave) => {
+                fave.faves = fave.faves.filter((rec) => { return rec !== recipe._id});
+                update_favers_tasks.push(fave.save());
+                return fave;
+            });
+            const result = await Promise.all(update_favers_tasks);
+            const comment = `Recipe with id: ${req.params.id} have been deleted by the ${req.user.role}`;
+            // notify favers
+            await notification_service.notify_all(result, comment, recipe);
+          }
 
-      await Recipe.deleteOne({ _id: recipe._id});
+          if(req.user.role !== Role.user) {
+            await notification_service.notify({
+              to: user,
+              comment: `Your Recipe ${recipe.name} have been deleted by Admin, check you email for further details`,
+              subject: recipe,
+            });
+          }
+        });
+
 
       return res
         .status(200)
@@ -1405,7 +1405,26 @@ class UserController {
           });
       }
 
-      await Review.deleteOne({ _id: review._id});
+      // if deleted by user
+      if(req.user.role === Role.user) {
+        await Review.deleteOne({ _id: review._id});
+      }
+
+      // if deleted by admin
+      if([Role.admin, Role.super_admin].includes(req.user.role)) {
+        await Connection
+          .transaction(async () => {
+            await Review.deleteOne({ _id: review._id});
+            // notifies user
+            console.log(review.user)
+            await notification_service.notify({
+              to: review.user,
+              comment: `Your Review: ${review.comment} on recipe: ${review.recipe.toString()} have been deleted, check youe email for further details`,
+              subject: review,
+            });
+          });
+      }
+      
 
       return res
         .status(200)

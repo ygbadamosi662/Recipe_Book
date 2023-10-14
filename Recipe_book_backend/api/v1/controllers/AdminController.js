@@ -50,7 +50,7 @@ class AdminController {
       // notify owner
       await Connection.transaction(async () => {
         const comment = `${user.name?.aka ? user.name.aka : user.name.fname + ' ' + user.name.lname} you are now a ${value.role} on this platform`;
-        user.save();
+        await user.save();
         await notification_service
           .notify({
             comment: comment,
