@@ -17,6 +17,7 @@ const { Permit, Status, Which, Role } = require('../enum_ish');
 
 class UserController {
   static async get_user(req, res) {
+    // serves both user and admin
     try {
       if(!req.params.id) {
         return res
@@ -258,7 +259,11 @@ class UserController {
   
   static async get_recipe(req, res) {
     try {
-      if (!req.params.id) { return res.status(400).json({ msg: 'id is required'}); }
+      if (!req.params.id) { 
+        return res
+        .status(400)
+        .json({ msg: 'Invalid request, id is required'}); 
+      }
       const recipe = await Recipe.findById(req.params.id).exec();
 
       if (!recipe) {
@@ -765,7 +770,7 @@ class UserController {
       
       
       let rev = {};
-      Connection.transaction(async () => {
+      await Connection.transaction(async () => {
           // notify owner
           rev = await Review.create(value);
           const comment = `${value['user'].name.aka ? value['user'].name.aka : value['user'].name.fname + ' ' + value['user'].name.lname} wrote a review for your recipe`;
@@ -1307,6 +1312,108 @@ class UserController {
         .status(200)
         .json({ users: users ? users : [] })
     } catch (error) {
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
+
+  static async delete_recipe(req, res) {
+    try {
+      if (!req.params.id) { 
+        return res
+        .status(400)
+        .json({ msg: 'Invalid request, id is required'}); 
+      }
+      const recipe = await Recipe.findById(req.params.id);
+      if(![Role.admin, Role.super_admin].includes(req.user.role)) {
+        if(req.user.id !== recipe.user.toString()) {
+          return res
+            .status(400)
+            .json({
+              message: 'Bad request, Invalid credentials'
+            })
+        }
+      }
+
+      if (!recipe) {
+        return res
+          .status(401)
+          .json({
+            msg: 'Bad request, recipe does not exist',
+          });
+      }
+      const user = await User.findById(recipe.user.toString());
+
+
+      // update user.recipes
+      user.recipes = user.recipes.filter((rec) => { return rec !== recipe._id});
+      user.save();
+
+      await Recipe.deleteOne({ _id: recipe._id});
+
+      return res
+        .status(200)
+        .json({
+          message: `Recipe with id: ${req.params.id} successfully deleted`,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
+
+  static async delete_review(req, res) {
+    try {
+      if (!req.params.id) { 
+        return res
+        .status(400)
+        .json({ msg: 'Invalid request, id is required'}); 
+      }
+      const review = await Review.findById(req.params.id);
+      if(![Role.admin, Role.super_admin].includes(req.user.role)) {
+        if(req.user.id !== review.user.toString()) {
+          return res
+            .status(400)
+            .json({
+              message: 'Bad request, Invalid credentials'
+            })
+        }
+      }
+
+      if (!review) {
+        return res
+          .status(401)
+          .json({
+            msg: 'Bad request, review does not exist',
+          });
+      }
+
+      await Review.deleteOne({ _id: review._id});
+
+      return res
+        .status(200)
+        .json({
+          message: `Review with id: ${req.params.id} successfully deleted`,
+        });
+    } catch (error) {
+      
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
         return res.status(500).json({error: error.message});

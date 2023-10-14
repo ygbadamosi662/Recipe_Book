@@ -666,6 +666,116 @@ class AdminController {
     }
   }
 
+  static async get_recipe(req, res) {
+    try {
+      if (!req.params.id) { 
+        return res
+        .status(400)
+        .json({ msg: 'Invalid request, id is required'}); 
+      }
+      const recipe = await Recipe.findById(req.params.id);
+
+      if (!recipe) {
+        return res
+          .status(401)
+          .json({
+            msg: 'Bad request, recipe does not exist',
+          });
+      }
+
+      return res
+        .status(200)
+        .json({
+          recipe: recipe,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
+
+  static async get_review(req, res) {
+    try {
+      if (!req.params.id) { 
+        return res
+        .status(400)
+        .json({ msg: 'Invalid request, id is required'}); 
+      }
+      const rev = await Review.findById(req.params.id);
+
+      if (!rev) {
+        return res
+          .status(401)
+          .json({
+            msg: 'Bad request, recipe does not exist',
+          });
+      }
+
+      return res
+        .status(200)
+        .json({
+          review: rev,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
+
+  static async get_notification(req, res) {
+    try {
+      if (!req.params.id) { 
+        return res
+        .status(400)
+        .json({ msg: 'Invalid request, id is required'}); 
+      }
+      const notification = await Notification.findById(req.params.id);
+
+      if (!notification) {
+        return res
+          .status(401)
+          .json({
+            msg: 'Bad request, recipe does not exist',
+          });
+      }
+
+      return res
+        .status(200)
+        .json({
+          notification,
+        });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
 }
 
 

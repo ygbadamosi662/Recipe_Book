@@ -188,7 +188,7 @@ class AppController {
     }
   }
 
-  static async forgot_pwd(req, res) {
+  static async forget_pwd(req, res) {
     try {
       const schema = Joi.object({
         email: Joi
