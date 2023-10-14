@@ -1,0 +1,46 @@
+.review-header {
+  text-align: center;
+}
+
+.reviews-container {
+  display: block;
+  justify-content: center;
+  align-items: center;
+}
+
+.cards {
+  display: block;
+  width: 100%;
+  height: 30%;
+  padding: 0.7rem;
+  margin: 2rem 0;
+  border: 1px solid lightgray;
+  border-radius: 20px;
+}
+
+.review-img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 1025px) {
+  .reviews-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 2rem;
+    justify-items: center;
+  }
+
+  .cards {
+    display: block;
+    width: 70%;
+    height: auto;
+  }
+  .review-img {
+    width: 100%;
+    height: auto;
+  }
+}
