@@ -16,7 +16,7 @@ userRoutes.post('/recipe/get/recipes', UserController.get_recipes);
 userRoutes.get('/recipe/delete/:id', UserController.delete_recipe);
 userRoutes.post('/recipe/get/recipes/mine', UserController.get_my_recipes);
 userRoutes.get('/recipe/get/:id', UserController.get_recipe);
-userRoutes.get('/recipe/get/reviews/:id', UserController.get_recipe_reviews);
+userRoutes.post('/recipe/get/reviews', UserController.get_recipe_reviews);
 userRoutes.get('/recipe/fave/:id', UserController.fave_recipe);
 userRoutes.post('/recipe/review', UserController.review_recipe);
 userRoutes.get('/review/:id', UserController.get_review);

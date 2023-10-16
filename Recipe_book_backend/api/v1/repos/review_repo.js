@@ -45,7 +45,7 @@ class ReviewRepo {
       .limit(PAGE_SIZE)
       .sort({ stars: 1 })
       .exec();
-    return recs;
+    return revs;
   }
 
   async has_next_page(filter, page=1, page_size=this._page_size) {

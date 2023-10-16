@@ -239,7 +239,8 @@ class UserController {
       return res
         .status(200)
         .json({
-          message: `Recipe ${rec.id} successfully updated`,
+          message: `Recipe successfully updated`,
+          recipe: rec.id
         });
     } catch (error) {
       
@@ -808,23 +809,30 @@ class UserController {
   static async get_recipe_reviews(req, res) {
     try {
       const schema = Joi.object({
-        recipe_id: Joi
-          .string()
-          .required(),
         count: Joi
           .boolean()
+          .required()
+          .default(false),
+        filter: Joi.object({
+          recipe: Joi
+            .string()
+            .required(),
+          stars: Joi // an array for range like [from, to], [stars] will mean >= stars
+            //[0, stars] will mean <= stars and [stars, stars] will mean == stars
+            .array()
+            .items(Joi.number().integer()),
+          comment: Joi
+            .string(),
+          })
           .required(),
-        stars: Joi
-          .array()
-          .items(Joi.string()),
-        comment: Joi
-          .string(),
         page: Joi
           .number()
-          .integer(),
+          .integer()
+          .default(1),
         size: Joi
           .number()
-          .integer(),
+          .integer()
+          .default(20),
       });
 
       // validate body
@@ -833,33 +841,8 @@ class UserController {
         throw error;
       }
 
-      const fields = [
-        'stars',
-        'comment',
-        'page',
-        'size',
-      ];
-
-      const just_checking = () => {
-        const objectEntries = Object.entries(value);
-
-        for (const [key, value] of objectEntries) {
-          if (fields.includes(key)) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      // checks if any other field aside 
-      if (!just_checking()) {
-        return res
-          .status(400)
-          .json({ message: 'No data provided'});
-      }
-
       // validates recipe
-      const rec = await Recipe.findById(value.recipe_id);
+      const rec = await Recipe.findById(value.filter.recipe);
       if(!rec) {
         return res
           .status(401)
@@ -868,16 +851,32 @@ class UserController {
           });
       }
 
+      // build query
+      let filter = {};
+      filter = value.filter;
+      filter.recipe = rec;
+      if(filter.comment) {
+        filter.comment = new RegExp(filter.comment);
+      }
+
+      if(filter.stars) {
+        if(filter.stars[0] === filter.stars[1]) {
+          filter.stars = filter.stars[0];
+        }
+        if(filter.stars.length === 1) {
+          filter.stars = { $gte: filter.stars[0] };
+        }
+        if(filter.stars[0] === 0) {
+          filter.stars = { $lte: filter.stars[1] };
+        }
+        if((filter.stars.length === 2) && (filter.stars[0] !== 0)) {
+          filter.stars = { $gte: filter.stars[0], $lte: filter.stars[1] };
+        }
+      }
+
       // if count is true, consumer just wants a count of the filtered documents
       if (value.count) {
-        let filters = value;
-        delete filters.page;
-        delete filters.size;
-        if (filters.comment) {
-          filters.comment = new RegExp(`${filters['comment']}`);
-        }
-        filters.recipe = rec;
-        const count = await Review.countDocuments(filters);
+        const count = await Review.countDocuments(filter);
 
         return res
             .status(200)
@@ -886,22 +885,8 @@ class UserController {
             });
       }
 
-      let filters_and_pageStuff = value;
-      delete filters_and_pageStuff.recipe_id;
-      filters_and_pageStuff.recipe = rec;
-      
-      if (filters_and_pageStuff['comment']) {
-        filters_and_pageStuff.comment = new RegExp(`${filters_and_pageStuff['comment']}`);
-      }
-
-      let filter = {};
-      // fill up filter
-      if(value.comment) { filter.comment = filters_and_pageStuff.comment; }
-      if(value.stars) { filter.starts = value.stars; }
-      filter.recipe = rec
-
       const gather_data_task = Promise.all([
-        review_repo.get_recs(filters_and_pageStuff), //get reviewa
+        review_repo.get_revs({ ...filter, page: value.page, size: value.size}), //get reviewa
         review_repo.has_next_page(filter, value.page, value.size), //if there is a next page
         review_repo.total_pages(filter, value.size), //get total pages
       ]);
