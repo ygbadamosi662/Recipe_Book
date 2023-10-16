@@ -85,7 +85,7 @@ class AdminController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required(),
+          .default(false),
         filter: Joi
           .object({
             name: Joi
@@ -244,7 +244,7 @@ class AdminController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required(),
+          .default(false),
         filter: Joi
           .object({
             name: Joi
@@ -260,7 +260,8 @@ class AdminController {
               .string(),
             permit: Joi
               .string()
-              .valid(...Object.values(Permit)),
+              .valid(...Object.values(Permit))
+              .default(Permit.public),
             user: Joi
               .string(),
             createdAt: Joi
@@ -387,7 +388,7 @@ class AdminController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required(),
+          .default(false),
         filter: Joi
           .object({
             comment: Joi

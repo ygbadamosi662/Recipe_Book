@@ -1,4 +1,8 @@
 import jwtDecode from "jwt-decode";
+/**
+* Handles Jwt
+* @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
+*/
 
 export const isAuthenticated = () => {
   const token = getToken();

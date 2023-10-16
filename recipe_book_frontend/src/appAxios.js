@@ -1,5 +1,8 @@
 import axios from 'axios';
-
+/**
+* Axios configuration
+* @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
+*/
 const appAx = axios.create({
   baseURL: 'http://127.0.0.1:3000',
   headers: {

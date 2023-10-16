@@ -405,7 +405,7 @@ class UserController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required(),
+          .default(false),
         name: Joi
           .string(),
         ingredients: Joi
@@ -811,7 +811,6 @@ class UserController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required()
           .default(false),
         filter: Joi.object({
           recipe: Joi
@@ -965,7 +964,7 @@ class UserController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required(),
+          .default(false),
         comment: Joi
           .string(),
         status: Joi
@@ -1016,31 +1015,24 @@ class UserController {
 
       const user_pr = user_repo.findByEmail(req.user.email, ['id']);
 
-      // if count is true, consumer just wants a count of the filtered documents
-      if (value.count) {
-        const count = await Notification
-          .countDocuments({ 
-            status: value.status,
-            to: await user_pr,
-          });
-
-        return res
-            .status(200)
-            .json({
-              status: value.status,
-              count: count,
-            });
-      }
-
-      // get notifications
-      // const notes = 
-
       // fill up filter
       let filter = {};
       if(value.comment) { filter.comment = new RegExp(`${value['comment']}`); }
       if(value.status) { filter.status = value.status; }
       const user = await user_pr;
       filter.user = user;
+
+      // if count is true, consumer just wants a count of the filtered documents
+      if (value.count) {
+        const count = await Notification
+          .countDocuments(filter);
+        return res
+          .status(200)
+          .json({
+            status: value.status,
+            count: count,
+          });
+      }
 
       const gather_data_task = Promise.all([
         await Notification
@@ -1054,26 +1046,29 @@ class UserController {
       ]);
 
       const done = await gather_data_task;
-
+      let result = [];
       if (done[0]) {
         // update notification status
         await Connection
           .transaction(async () => {
+            let gather_task = [];
             done[0].map((note) => {
               note.status = Status.received;
-              note.save();
+              gather_data_task.push(note.save());
             });
+
+            result = await Promise.all(gather_task);
           });
       }
-
 
       return res
         .status(200)
         .json({
-          notes: done[0] ? done[0].map((note) => {
+          notes: result ? result.map((note) => {
             return {
               id: note.id,
               comment: note.comment,
+              status: note.status
             };
           }) : [],
           have_next_page: done[1],
@@ -1225,11 +1220,11 @@ class UserController {
       const schema = Joi.object({
         count: Joi
           .boolean()
-          .required(),
+          .default(false),
         which: Joi
           .string()
           .valid(...Object.values(Which))
-          .required(),
+          .default(Which.followers),
       });
 
       // validate body
