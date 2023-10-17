@@ -13,6 +13,7 @@ function Navbar() {
 
   // ShowNavbar toggles the visibility of the navbar
   const showNavbar = () => {
+    console.log(navRef.current);
     navRef.current.classList.toggle("responsive_nav");
   };
 
@@ -32,14 +33,14 @@ function Navbar() {
       <h1>Recipe Book</h1>
       {/* <nav ref={navRef}> */}
       {/* div component for nav links */}
-      <div className="nav">
+      <div className="nav" ref={navRef}>
         <div
           //ternary operator to make the link active when you're on the page
           className={` `}
           to=""
           onClick={handleClick}
         >
-          <a href="javascript:void(0)">Home</a>
+          <a href="/">Home</a>
         </div>
 
         <div className={``} onClick={handleClick} to="">
@@ -50,7 +51,7 @@ function Navbar() {
         </div>
         {auth && (
           <div className={``} to="" onClick={handleClick}>
-            <a href="javascript:void(0)">Recipe</a>
+            <a href="javascript:void(0)">Profile</a>
           </div>
         )}
       </div>
@@ -62,7 +63,7 @@ function Navbar() {
             </div>
             <button className="sign-up" onClick={handleClick}>
               <div className={``} to="">
-                Sign up
+                <a href="/signup"> Sign up </a>
               </div>
             </button>
           </div>
@@ -86,9 +87,16 @@ function Navbar() {
       {auth && <span className="greeting1">Hi, {name}</span>}
 
       {/* Hambuger button to open navbar menu */}
-      <button className="nav-btn" onClick={showNavbar}>
-        <FaBars />
-      </button>
+      <div className="hamburger-button " >
+        <button className="nav-btn" onClick={showNavbar}>
+          <FaBars />
+        </button>
+        {/* <div className="hamburger-details">
+          <a href="javascript:void(0)">Home</a>
+          <a href="javascript:void(0)">Recipe</a>
+          <a href="javascript:void(0)">Favourite</a>
+        </div> */}
+      </div>
     </header>
   );
 }

@@ -1,6 +1,5 @@
 import React from "react";
 import "./Home.css";
-import Navbar from "../../components/navbar/Navbar";
 import Reviews from "../../components/reviews/Reviews";
 import Recipe from "../recipe/Recipe";
 
