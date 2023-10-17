@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-export const recipe = [
+export const recipes = [
   {
     id: nanoid(),
     image: "https://images.unsplash.com/photo-1532980400857-e8d9d275d858?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2787&q=80",

@@ -123,6 +123,45 @@ class DbStorage {
     }
   }
 
+  async blacklist_reset_token(tokenObj) {
+    try {
+      // Read data from blacklist.json
+      const data = await fs.readFile(this._json_file, 'utf8');
+      let jsonData;
+      if (!data) {
+        jsonData = {
+          reset_tokens: [],
+        };
+      } else {
+        jsonData = JSON.parse(data);
+      }
+  
+      jsonData.jwts.push(tokenObj);
+  
+      const updatedData = JSON.stringify(jsonData, null, 2);
+  
+      await fs.writeFile(this._json_file, updatedData, 'utf8');
+  
+      console.log('token blacklisted');
+      
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async get_reset_token(token) {
+    try {
+      const jsonData = await fs.readFile(this._json_file, 'utf8');
+      if (!jsonData) {
+        return null;
+      }
+      const blacklisted_token = JSON.parse(jsonData).reset_tokens.find((black) => black.token === token);
+      return blacklisted_token;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
 
 const db_storage = new DbStorage();

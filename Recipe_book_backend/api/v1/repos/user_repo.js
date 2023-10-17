@@ -10,6 +10,7 @@ class UserRepo {
     try {
       this._repo = db_storage.get_a_repo(User_str);
       this._conn = db_storage.conn;
+      this._page_size = 20;
     } catch (error) {
       throw error;
     }
@@ -63,6 +64,33 @@ class UserRepo {
     try {
       const User = this._repo
       return await User.create(user);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async has_next_page(filter, page=1, page_size=this._page_size) {
+    try {
+      const totalCount = await this._repo
+        .countDocuments(filter)
+        .exec();
+
+      const totalPages = Math.floor(totalCount / page_size);
+      const hasNextPage = page < totalPages;
+
+      return hasNextPage;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async total_pages(filter, page_size=this._page_size) {
+    try {
+      const totalCount = await this._repo
+        .countDocuments(filter)
+        .exec();
+
+      return Math.floor(totalCount / page_size);;
     } catch (error) {
       throw error;
     }

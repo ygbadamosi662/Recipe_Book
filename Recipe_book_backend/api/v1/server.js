@@ -6,15 +6,39 @@ const express = require('express');
 const cors = require('cors');
 const gracefulShutdown = require('express-graceful-shutdown');
 const morgan = require('morgan');
+const { Role } = require('./enum_ish.js');
+const { user_repo } = require('./repos/user_repo.js');
+const util = require('./util.js');
 require('dotenv').config();
 
-// const db_storage = require('./models/engine/db_storage.js');
 
 
 const app = express();
 const PORT = 1245;
 const PATH_PREFIX = '/api/v1';
 
+// App creates the God User of this app if it does not exist
+const God = (async () => {
+  try {
+    if(await user_repo.existsByEmail(process.env.APP_EMAIL)) {
+      console.log(`${process.env.APP_EMAIL}: We are open for business`);
+      return null;
+    }
+    await user_repo.create_user({
+      email: process.env.APP_EMAIL,
+      password: await util.encrypt_pwd(process.env.APP_PWD),
+      role:Role.super_admin,
+      phone: process.env.APP_PHONE,
+      name: {
+        fname: 'Recipe',
+        lname: 'Book',
+        aka: 'Food Book',
+      }
+    });
+  } catch (error) {
+    console.log('Error creating or checking for God user', error);
+  }
+})();
 
 // Enable cors
 app
@@ -36,7 +60,17 @@ app.use(morgan('dev'));
 // maps all routes to our express app
 app.use(PATH_PREFIX+'/general', generalRoutes);
 app.use(PATH_PREFIX+'/auth', authenticate_token, authRoutes);
-// generalRoutes(app);
+
+// handles God.
+God
+  .then((resolved) => {
+    if(resolved) {
+      console.log(`${process.env.APP_EMAIL}: We are open for business`);
+    }
+  })
+  .catch((err) => {
+    console.log('Something is wrong....', err);
+  });
 
 app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT}`);

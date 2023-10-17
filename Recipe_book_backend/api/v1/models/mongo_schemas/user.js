@@ -66,6 +66,8 @@ const userSchema = new Schema({
     enum: Object.values(Role),
     default: Role.user,
   },
+  resetPasswordToken: String,
+  resetPasswordTokenExpires: Date,
 }, { timestamps: true });
 
 userSchema.pre('validate', function (next) {

@@ -24,7 +24,6 @@ class JwtService {
 
 }
 
-
 const authenticate_token = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -62,4 +61,4 @@ const authenticate_token = async (req, res, next) => {
 
 const jwt_service = new JwtService(); 
 
-module.exports = { jwt_service, JwtService, authenticate_token };
+module.exports = { jwt_service, authenticate_token };

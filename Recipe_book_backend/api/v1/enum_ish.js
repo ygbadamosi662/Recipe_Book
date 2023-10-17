@@ -1,6 +1,7 @@
 const Role = {
     user: 'USER',
     admin: 'ADMIN',
+    super_admin: 'SUPER ADMIN',
 };
 const Type = { 
     soup: 'SOUP',
@@ -27,4 +28,9 @@ const Which = {
     followers: 'followers',
 }
 
-module.exports = { Role, Type, Permit, Status, Which };
+const Is_Verified = {
+    verified: 'VERIFIED',
+    not_verified: 'NOT VERIFIED',
+}
+
+module.exports = { Role, Type, Permit, Status, Which, Is_Verified };

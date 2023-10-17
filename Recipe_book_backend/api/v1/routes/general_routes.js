@@ -13,6 +13,9 @@ const generalRoutes = express.Router();
 generalRoutes.get('/', AppController.home);
 generalRoutes.post('/register', AppController.register_user);
 generalRoutes.post('/login', AppController.login);
+generalRoutes.post('/forget-password', AppController.forget_pwd); // not tested properly nodemailer problem
+generalRoutes.get('/forget-password/validate-token/:token', AppController.validate_reset_pwd_token);
+generalRoutes.post('/forget-password/update', AppController.reset_password);
 
 
 module.exports = { generalRoutes };
