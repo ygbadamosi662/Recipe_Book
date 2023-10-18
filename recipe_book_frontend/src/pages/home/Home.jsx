@@ -1,6 +1,5 @@
 import React from "react";
 import "./Home.css";
-import Navbar from "../../components/navbar/Navbar";
 import Reviews from "../../components/reviews/Reviews";
 import Recipe from "../recipe/Recipe";
 
@@ -17,18 +16,13 @@ const Home = () => {
         </div>
         <div className="hero-story">
           <p>
-            orem ipsum dolor sit amet, consectetur adipiscing elit. Donec
+            Welcome ipsum dolor sit amet, consectetur adipiscing elit. Donec
             vulputate iaculis ante, commodo rutrum arcu suscipit lobortis.
             Praesent leo nisl, convallis a mollis ac, facilisis eget purus.
             Praesent dapibus eleifend diam nec imperdiet. Integer et convallis
             velit, nec posuere libero. Donec non rutrum risus. In porttitor
             justo mi, sit amet imperdiet sapien venenatis vel. Donec viverra
-            velit quis eros pulvinar, sed hendrerit mi suscipit. Donec
-            imperdiet, nulla et iaculis aliquet, nulla lectus rutrum tellus,
-            commodo pellentesque lacus ipsum eu urna. Ut imperdiet eget neque in
-            feugiat. Vivamus id mauris vitae arcu sodales fringilla eu in mi.
-            Suspendisse eget cursus leo. In lorem tortor, dignissim ac luctus
-            eu, interdum vel sapien. In viverra, risus in accumsan rutrum, ante
+            velit quis eros pulvinar, sed hendrerit mi suscipit.
             tellus faucibus libero, eu dictum arcu tortor vel velit. Vivamus sit
             amet ullamcorper quam.
             <br />

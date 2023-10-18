@@ -6,7 +6,12 @@
   box-sizing: border-box;
   font-family: "Titillium Web", sans-serif;
 }
-
+:root {
+  --mainColorLight: #27031e;
+  --mainColor: #a80863;
+  --secondaryColor: #e6d6e5;
+  --textColor: #000;
+}
 header {
   display: flex;
   align-items: center;
@@ -17,7 +22,9 @@ header {
   background-color: #fff;
   position: fixed;
   z-index: 100;
+  /* background-color: red; */
 }
+
 header h1 {
   font-size: 2.5rem;
   font-family: "Times New Roman", Times, serif;
@@ -40,7 +47,7 @@ header h1 {
   color: var(--textColor);
 }
 .active {
-  color: #0a810c;
+  color: var(--mainColor);
 }
 
 .membership {
@@ -66,7 +73,7 @@ header .nav-btn {
 }
 
 .nav button {
-  width: 9rem;
+  width: 7rem;
   height: 3rem;
   font-size: 1.5rem;
   border-radius: 10px;
@@ -77,14 +84,19 @@ header .nav-btn {
 .sign-up {
   display: flex;
   justify-content: center;
-  /* text-align: center; */
+  font-size: 20px;
   align-items: center;
+  background-color: var(--mainColor) ;
 }
-.logout {
-  background-color: #023402;
+.sign-up a{
+  color: #fff;
 }
+
 .nav button:hover {
-  color: #055306;
+  color: var(--mainColor);
+}
+.nav a:hover{
+  color: var(--mainColor);
 }
 
 header div,
@@ -92,12 +104,7 @@ header div,
   display: flex;
   align-items: center;
 }
-/* .login{
-	padding-left: rem;
-} */
-/* .red {
-	background-color: red;
-} */
+
 
 .greeting {
   display: none;
@@ -105,8 +112,9 @@ header div,
 .greeting1 {
   margin-left: auto;
   font-size: 1.5rem;
-  color: #0a810c;
+  color: var(--mainColor);
 }
+
 @media only screen and (max-width: 1024px) {
   header .nav-btn {
     visibility: visible;
@@ -120,7 +128,7 @@ header div,
     width: 100vw;
     padding: 0 2rem;
     background-color: #fff;
-    position: fixed;
+    position: relative;
   }
   .nav {
     position: fixed;
@@ -138,6 +146,35 @@ header div,
   }
   h1 {
     font-size: 1.5rem;
+  }
+
+  .hamburger-button {
+    position: relative;
+  }
+
+  .hamburger-details {
+    display: flex;
+    flex-direction: column;
+    width: 10rem;
+    /* height: 10rem; */
+    /* padding: 1rem; */
+    border: 1px solid var(--mainColor);
+    border-radius: 10px;
+    position: absolute;
+    margin-top: 8.5rem;
+    margin-left: -7rem;
+    /* display: none; */
+  }
+
+  .hamburger-details a {
+    padding: 1rem;
+    border-bottom: .2px solid var(--mainColorLight);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+    color: #000;
+    font-size: larger;
   }
 
   header .responsive_nav {
@@ -159,7 +196,7 @@ header div,
   }
 
   nav a:hover {
-    color: #fff;
+    color: var(--mainColorLight);
   }
 
   .active {
@@ -167,16 +204,16 @@ header div,
   }
 
   nav button a:hover {
-    color: #0a810c;
+    color: var(--mainColor);
   }
 
   nav button .active {
-    color: #0a810c;
+    color: var(--mainColor);
   }
   .greeting {
     display: block;
     font-size: 1.2rem;
-    color: #fff;
+    color: var(--mainColorLight);
     /* float: right; */
   }
 
