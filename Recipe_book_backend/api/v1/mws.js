@@ -27,5 +27,4 @@ const authenticate_super_admin = async (req, res, next) => {
     }
 }
 
-
 module.exports = { authenticate_admin, authenticate_super_admin };

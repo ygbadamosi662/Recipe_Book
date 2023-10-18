@@ -3,6 +3,7 @@ const Role = {
     admin: 'ADMIN',
     super_admin: 'SUPER ADMIN',
 };
+
 const Type = { 
     soup: 'SOUP',
     pastry: 'PATRY',
@@ -12,6 +13,7 @@ const Type = {
     rice: 'RICE',
     food: 'FOOD',
 };
+
 const Permit = {
     private: 'PRIVATE',
     public: 'PUBLIC',
@@ -26,11 +28,18 @@ const Status = {
 const Which = {
     following: 'following',
     followers: 'followers',
-}
+};
 
 const Is_Verified = {
     verified: 'VERIFIED',
     not_verified: 'NOT VERIFIED',
-}
+};
 
-module.exports = { Role, Type, Permit, Status, Which, Is_Verified };
+const Collections = {
+  user: 'User',
+  recipe: 'Recipe',
+  review: 'Review',
+  notification: 'Notification',
+};
+
+module.exports = { Role, Type, Permit, Status, Which, Is_Verified, Collections };

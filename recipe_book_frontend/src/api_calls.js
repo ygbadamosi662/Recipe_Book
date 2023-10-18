@@ -7,12 +7,12 @@ import { appAx } from "./AppAxios"
 // General routes
 export const login = (payload) => {
 /**
-* payload: {
+* payload : {
 	email: <string> <required>,
 	password: <string> <required>,
   }
 
-  returns: {
+  returns{
     message: "Login succesful",
     user: <string: user's id>,
     token: <string: jwt token>
@@ -40,6 +40,15 @@ export const register = (payload) => {
 
 
 // auth routes: Headers: Authorization = 'Bearer <jwt_token>', Content-Type = 'application/json'.
+export const signout = () => {
+/**
+* returns: {
+*   message: 'Logged out succesfully',
+*   token: jwt_token
+* }
+*/
+  return appAx.get(`http://127.0.0.1:1245/api/v1/auth/logout`);
+};
 // auth routes: user specific routes
 export const getUser = (id) => {
 /**
