@@ -1,8 +1,10 @@
 import React from "react";
 import "./Recipe.css";
 import { recipes } from "../../data.js";
+import { useNavigate } from "react-router-dom";
 
 const Recipe = () => {
+  const navigate = useNavigate();
   const recipeElements = recipes.map((item) => {
     return (
       <div key={item.id} className="recipe-cards">
