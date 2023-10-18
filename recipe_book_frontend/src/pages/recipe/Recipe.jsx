@@ -1,9 +1,9 @@
 import React from "react";
 import "./Recipe.css";
-import { recipe } from "../../data.js";
+import { recipes } from "../../data.js";
 
 const Recipe = () => {
-  const recipeElements = recipe.map((item) => {
+  const recipeElements = recipes.map((item) => {
     return (
       <div key={item.id} className="recipe-cards">
         <a href={item.url}>
