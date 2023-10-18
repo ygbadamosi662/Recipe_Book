@@ -6,9 +6,9 @@ const { Recipe_str, User_str } = require('../../global_constants');
 const userSchema = new Schema({
   name: { 
     type: {
-      fname: { type: String, required: true },
-      lname: { type: String, required: true },
-      aka: String,
+      fname: { type: String, required: true, min: 3, max: 20 },
+      lname: { type: String, required: true, min: 3, max: 20 },
+      aka: { type: String, min: 3, max: 20},
     },
     required: true,
   },
@@ -69,36 +69,5 @@ const userSchema = new Schema({
   resetPasswordToken: String,
   resetPasswordTokenExpires: Date,
 }, { timestamps: true });
-
-userSchema.pre('validate', function (next) {
-  if (this.name.fname && this.name.fname.length < 2) {
-    return next(new Error('fname is too short'));
-  }
-
-  if (this.name.lname && this.name.lname.length < 2) {
-    return next(new Error('lname is too short'));
-  }
-
-  if (this.name.lname && this.name.lname.length > 20) {
-    return next(new Error('lname is too long'));
-  }
-
-  if (this.name.fname && this.name.fname.length > 20) {
-    return next(new Error('fname is too long'));
-  }
-
-  if (this.name.aka) {
-    if (this.name.aka && this.name.aka.length < 2) {
-      return next(new Error('lname is too short'));
-    }
-  
-    if (this.name.aka && this.name.aka.length > 20) {
-      return next(new Error('lname is too long'));
-    }
-  }
-
-  next();
-});
-
 
 module.exports = userSchema;

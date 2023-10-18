@@ -1,21 +1,15 @@
 process.traceProcessWarnings = true;
-const { generalRoutes } = require('./routes/general_routes.js');
-const { authRoutes } = require('./routes/auth_routes.js');
-const { authenticate_token } = require('./services/jwt_service.js');
+const { injectRoutes } = require('./routes');
+const { injectMalwares } = require('../v1/index');
+const { startServer } = require('./libs/boot');
 const express = require('express');
-const cors = require('cors');
 const gracefulShutdown = require('express-graceful-shutdown');
-const morgan = require('morgan');
 const { Role } = require('./enum_ish.js');
 const { user_repo } = require('./repos/user_repo.js');
 const util = require('./util.js');
 require('dotenv').config();
 
-
-
 const app = express();
-const PORT = 1245;
-const PATH_PREFIX = '/api/v1';
 
 // App creates the God User of this app if it does not exist
 const God = (async () => {
@@ -40,42 +34,46 @@ const God = (async () => {
   }
 })();
 
-// Enable cors
-app
-  .use(
-    cors({
-      origin: 'https://127.0.0.1:3000',
-      methods: 'GET,POST',
-      credentials: true, // Include cookies in CORS requests
-      optionsSuccessStatus: 204, // Respond with a 204 status for preflight requests
-    })
-  );
-
-// to parse request json
-app.use(express.json());
-
-// for logging requests details
-app.use(morgan('dev'));
+// inject middlewares
+injectMalwares(app);
 
 // maps all routes to our express app
-app.use(PATH_PREFIX+'/general', generalRoutes);
-app.use(PATH_PREFIX+'/auth', authenticate_token, authRoutes);
+injectRoutes(app);
 
 // handles God.
 God
   .then((resolved) => {
     if(resolved) {
-      console.log(`${process.env.APP_EMAIL}: We are open for business`);
+      console.log(`${process.env.APP_EMAIL}: God is set`);
     }
   })
   .catch((err) => {
     console.log('Something is wrong....', err);
   });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on PORT ${PORT}`);
+// start server
+startServer(app);
+
+// Graceful shutdown configuration
+const shutdown = gracefulShutdown(app, {
+  signals: 'SIGINT SIGTERM',
+  timeout: 30000,
 });
 
-app.use(gracefulShutdown(app));
+// Handle shutdown signals
+['SIGINT', 'SIGTERM'].forEach((signal) => {
+  process.on(signal, () => {
+    console.log(`Received ${signal}. Starting graceful shutdown...`);
+    shutdown()
+      .then(() => {
+        console.log('Server gracefully shut down.');
+        process.exit(0);
+      })
+      .catch((err) => {
+        console.error('Error during graceful shutdown:', err);
+        process.exit(1);
+      });
+  });
+});
 
 module.exports = app;
