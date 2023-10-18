@@ -13,7 +13,10 @@ const Recipe = () => {
             <img src={item.image} alt="logo.png" className="recipe-img" />
           </div>
           <div className="">
-            <p>{item.name}</p>
+            <p className="recipe-name">{item.name}</p>
+            <p>{item.recipe}</p>
+            <p className="recipe-link">{item.link}</p>
+            <p className="recipe-time">{item.time}</p>
             {/* <span>{item.icon}</span> */}
           </div>
         </a>

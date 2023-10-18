@@ -43,7 +43,7 @@ function Navbar() {
         </div>
 
         <div className={``} onClick={handleClick} to="">
-          <a href="javascript:void(0)">Recipe</a>
+          <a href="/recipe">Recipe</a>
         </div>
         <div className={``} onClick={handleClick} to="">
           <a href="javascript:void(0)">Favorite</a>

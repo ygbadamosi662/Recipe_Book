@@ -35,6 +35,13 @@
   border-radius: 20px;
   margin-bottom: 1rem;
 }
+.recipe-time, .recipe-name {
+  font-weight: bold;
+}
+.recipe-link{
+  color: blue;
+}
+
 
 @media screen and (min-width: 769px) {
   .recipe-container {
