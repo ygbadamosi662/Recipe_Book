@@ -1,8 +1,10 @@
 import React from "react";
 import "./Recipe.css";
 import { recipes } from "../../data.js";
+import { useNavigate } from "react-router-dom";
 
 const Recipe = () => {
+  const navigate = useNavigate();
   const recipeElements = recipes.map((item) => {
     return (
       <div key={item.id} className="recipe-cards">
@@ -11,7 +13,10 @@ const Recipe = () => {
             <img src={item.image} alt="logo.png" className="recipe-img" />
           </div>
           <div className="">
-            <p>{item.name}</p>
+            <p className="recipe-name">{item.name}</p>
+            <p>{item.recipe}</p>
+            <p className="recipe-link">{item.link}</p>
+            <p className="recipe-time">{item.time}</p>
             {/* <span>{item.icon}</span> */}
           </div>
         </a>

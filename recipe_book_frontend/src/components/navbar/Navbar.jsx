@@ -1,8 +1,7 @@
 import { useRef } from "react";
-
 import { FaBars, FaTimes } from "react-icons/fa"; // imported icons from react-icons
 import "./Navbar.css";
-// import { div } from "react-router-dom"; // import the 'div' component from the React Router library.
+
 
 //Navbar Component
 function Navbar() {
@@ -44,7 +43,7 @@ function Navbar() {
         </div>
 
         <div className={``} onClick={handleClick} to="">
-          <a href="javascript:void(0)">Recipe</a>
+          <a href="/recipe">Recipe</a>
         </div>
         <div className={``} onClick={handleClick} to="">
           <a href="javascript:void(0)">Favorite</a>

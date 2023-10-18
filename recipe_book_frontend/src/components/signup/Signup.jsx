@@ -169,7 +169,7 @@ const Signup = () => {
           />
           {error.number && (
             <span className="error-message">
-              <small>IInvalid phone number</small>
+              <small>Invalid phone number</small>
             </span>
           )}
           <button type="submit">Sign Up</button>

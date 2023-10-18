@@ -1,5 +1,8 @@
 .home-story {
-  padding: 0 4rem;
+  padding: 2rem 4rem;
+}
+.hero-story p{
+  font-size: 1.4rem;
 }
 .hero-container {
   display: block;
