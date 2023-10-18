@@ -59,7 +59,7 @@ function Navbar() {
         {!auth ? (
           <div className="membership">
             <div className={``} to="" onClick={handleClick}>
-              <a href="javascript:void(0)">Sign In</a>
+              <a href="/login">Sign In</a>
             </div>
             <button className="sign-up" onClick={handleClick}>
               <div className={``} to="">
