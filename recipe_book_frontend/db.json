@@ -1,0 +1,112 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "fname": "John",
+      "lname": "Doe",
+      "email": "test@example.com",
+      "password": "Test1@as",
+      "phone": "08012345678"
+    },
+    {
+      "fname": "Test",
+      "lname": "testa",
+      "email": "email@example.com",
+      "password": "Testa1@asd",
+      "cpassword": "Testa1@asd",
+      "phone": "09012345678",
+      "id": 2
+    },
+    {
+      "email": "email@example.com",
+      "password": "Testa1@as",
+      "id": 3
+    },
+    {
+      "email": "email@example.com",
+      "password": "Testa1@asd",
+      "id": 4
+    },
+    {
+      "fname": "Him",
+      "lname": "Himothy",
+      "email": "him@bross.com",
+      "password": "Himothy1@",
+      "cpassword": "Himothy1@",
+      "phone": "09012345678",
+      "id": 5
+    },
+    {
+      "fname": "Him",
+      "lname": "Himari",
+      "email": "himo@hime.com",
+      "password": "Himariwa1@",
+      "cpassword": "Himari",
+      "phone": "090123456",
+      "id": 6
+    },
+    {
+      "fname": "hama",
+      "lname": "a",
+      "email": "asa@as",
+      "password": "Him",
+      "cpassword": "Hi",
+      "phone": "0901",
+      "id": 7
+    },
+    {
+      "fname": "a",
+      "lname": "Q",
+      "email": "as@as",
+      "password": "Him",
+      "cpassword": "Hi",
+      "phone": "0902",
+      "id": 8
+    },
+    {
+      "fname": "asd",
+      "lname": "asd",
+      "email": "asd@aas.co",
+      "password": "Asd1@asd",
+      "cpassword": "Asd1@asd",
+      "phone": "0901234567",
+      "id": 9
+    },
+    {
+      "fname": "ama",
+      "lname": "amama",
+      "email": "asd@lkj.com",
+      "password": "Asd1@asd",
+      "cpassword": "Asd1@asd",
+      "phone": "0901234",
+      "id": 10
+    },
+    {
+      "fname": "asd",
+      "lname": "asd",
+      "email": "asd@ags.co",
+      "password": "Testa1@as",
+      "cpassword": "Testa1@as",
+      "phone": "0",
+      "id": 11
+    },
+    {
+      "fname": "llkk",
+      "lname": "lkk",
+      "email": "lkj@lkjh.com",
+      "password": "Testa1@as",
+      "cpassword": "Testa1@as",
+      "phone": "09012345678",
+      "id": 12
+    },
+    {
+      "fname": "qsq",
+      "lname": "qqw",
+      "email": "ass@qsqqwwq.com",
+      "password": "Testa1@as",
+      "cpassword": "Testa1@as",
+      "phone": "09012345678",
+      "id": 13
+    }
+  ]
+}
