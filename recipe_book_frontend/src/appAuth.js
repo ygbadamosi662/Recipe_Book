@@ -56,3 +56,5 @@ export const decodeToken = (jwt) => {
 export const logout = () => {
   localStorage.removeItem('jwt');
 };
+
+
