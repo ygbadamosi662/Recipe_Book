@@ -1,4 +1,4 @@
-const util = require('../util');
+require('dotenv').config();
 const { user_repo, User } = require('../repos/user_repo');
 const { Recipe, recipe_repo } = require('../repos/recipe_repo');
 const { Review, review_repo } = require('../repos/review_repo');
@@ -8,7 +8,7 @@ const { Connection } = require('../models/engine/db_storage');
 const MongooseError = require('mongoose').Error;
 const JsonWebTokenErro = require('jsonwebtoken').JsonWebTokenError;
 const Joi = require('joi');
-const { redisClient } = require('../redis');
+// const { redisClient } = require('../redis');
 const { Permit, Status, Role, Collections } = require('../enum_ish');
 /**
  * Contains the UserController class 
@@ -131,22 +131,24 @@ class AdminController {
 
       // if count is true, consumer just wants a count of the filtered documents
       if (value.count) {
-        let count = 0;
-        // check cache
-        const check_cache = await redisClient.get_cache(Collections.user, filter, true);
-        // returns cache
-        if(check_cache) {
-          console.log('returned cache');
-          count = check_cache
-        }
+        // let count = 0;
+        // // check cache
+        // const check_cache = await redisClient.get_cache(Collections.user, filter, true);
+        // // returns cache
+        // if(check_cache) {
+        //   console.log('returned cache');
+        //   count = check_cache
+        // }
 
-        // if no cache
-        if(!check_cache) {
-          count = await User
+        // // if no cache
+        // if(!check_cache) {
+        //   count = await User
+        //     .countDocuments(value.filter);
+        //   await redisClient.set_cache(Collections.user, filter, count, 30* 60, true);
+        // }
+        const count = await User
             .countDocuments(value.filter);
-          await redisClient.set_cache(Collections.user, filter, count, 30* 60, true);
-        }
-
+          // await redisClient.set_cache(Collections.user, filter, count, 30* 60, true);
         return res
           .status(200)
           .json({
@@ -156,14 +158,14 @@ class AdminController {
       }
 
       // check cache
-      const check_cache = await redisClient.get_cache(Collections.user, filter);
-      // return cache
-      if(check_cache) {
-        console.log('returned cache');
-        return res
-          .status(200)
-          .json(check_cache);
-      }
+      // const check_cache = await redisClient.get_cache(Collections.user, filter);
+      // // return cache
+      // if(check_cache) {
+      //   console.log('returned cache');
+      //   return res
+      //     .status(200)
+      //     .json(check_cache);
+      // }
 
       const gather_data_task = Promise.all([
         User
@@ -178,11 +180,11 @@ class AdminController {
 
       const datas = await gather_data_task;
       // cache response
-      await redisClient.set_cache(Collections.user, filter, {
-        users: datas[0],
-        have_next_page: datas[1],
-        total_pages: datas[2],
-      }, 15 * 60);
+      // await redisClient.set_cache(Collections.user, filter, {
+      //   users: datas[0],
+      //   have_next_page: datas[1],
+      //   total_pages: datas[2],
+      // }, 15 * 60);
       
       return res
         .status(200)

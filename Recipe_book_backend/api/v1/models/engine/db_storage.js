@@ -26,7 +26,7 @@ class DbStorage {
 
       this._mongo_db = mongoose;
       this.mongo_repos = {};
-      this._json_file = path.join(__dirname, 'blacklist.json');;
+      this._json_file = path.join(__dirname, 'blacklist.json');
     } catch (error) {
       console.log('Database connection failed');
       throw error;

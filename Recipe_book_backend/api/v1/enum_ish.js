@@ -42,4 +42,32 @@ const Collections = {
   notification: 'Notification',
 };
 
-module.exports = { Role, Type, Permit, Status, Which, Is_Verified, Collections };
+const Power = {
+  on: 'ON',
+  off: 'OFF',
+}
+
+const RedisFormatCombo = {
+  User: {
+    single: ['User', 'single'],
+    list: ['User', 'list', 'list'],
+    count: ['User', 'list', 'count'],
+  },
+  Recipe: {
+    single: ['Recipe', 'single'],
+    list: ['Recipe', 'list', 'list'],
+    count: ['Recipe', 'list', 'count'],
+  },
+  Review: {
+    single: ['Review', 'single'],
+    list: ['Review', 'list', 'list'],
+    count: ['Review', 'list', 'count'],
+  },
+  Notification: {
+    single: ['Notification', 'single'],
+    list: ['Notification', 'list', 'list'],
+    count: ['Notification', 'list', 'count'],
+  },
+}
+
+module.exports = { Role, Type, Permit, Status, Which, Is_Verified, Collections, Power, RedisFormatCombo };
