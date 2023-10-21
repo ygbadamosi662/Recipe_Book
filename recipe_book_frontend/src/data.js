@@ -152,7 +152,7 @@ const reviews = [
     image:
       "https://images.unsplash.com/photo-1611432579699-484f7990b127?auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDd8fGJsYWNrJTIwd29tYW58ZW58MHx8MHx8fDA%3D&w=800",
     name: "Mary Williams",
-    location: "",
+    location: "Lagos, Nigeria",
     rating: "⭐️⭐️⭐️⭐️⭐️",
     desc: "orem ipsum dolor sit amet, consectetur adipiscing elit. Donec vulputate iaculis ante, commodo rutrum arcu suscipit lobortis. Praesent leo nisl, convallis a mollis ac, facilisis eget purus. orem ipsum dolor sit amet, consectetur adipiscing elit.",
     icons: "United Kingdom",

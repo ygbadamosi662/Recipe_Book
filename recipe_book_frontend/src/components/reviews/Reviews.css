@@ -1,3 +1,15 @@
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+:root {
+  --mainColorLight: #27031e;
+  --mainColor: #a80863;
+  --secondaryColor: #e6d6e5;
+  --textColor: #000;
+}
 .review-header {
   text-align: center;
 }
@@ -28,10 +40,10 @@
 }
 .review-names{
   font-size: 23px;
-  color: darkred;
+  color: var(--mainColor);
 }
 .review-rating{
-  border-bottom: 1px solid darkred;
+  border-bottom: 1px solid var(--mainColorLight);
 }
 .review-desc{
   font-size: 14px;
