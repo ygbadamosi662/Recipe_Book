@@ -5,8 +5,11 @@ import Home from "./pages/home/Home";
 import Signup from "./components/signup/Signup";
 import Login from "./components/login/Login";
 import Recipe from "./pages/recipe/Recipe";
+import Favorite from "./pages/favorite/Favorite";
+import { useState } from "react";
 
 function App() {
+  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   return (
     <div className="App">
       <Navbar />
@@ -15,6 +18,9 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/recipe" element={<Recipe />} />
+        <Route
+          path="/favorite" element={<Favorite favoriteRecipes={favoriteRecipes} />}
+        />
       </Routes>
     </div>
   );

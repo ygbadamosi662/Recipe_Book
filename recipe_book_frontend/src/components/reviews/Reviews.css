@@ -5,14 +5,14 @@
 
 .reviews-container {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
   justify-items: center;
 }
 
 .cards {
   display: block;
-  width: 50%;
+  width: 100%;
   height: auto;
   padding: 0.7rem;
   margin: 2rem 0;
@@ -26,11 +26,22 @@
   border-radius: 20px;
   margin-bottom: 1rem;
 }
+.review-names{
+  font-size: 23px;
+  color: darkred;
+}
+.review-rating{
+  border-bottom: 1px solid darkred;
+}
+.review-desc{
+  font-size: 14px;
+  
+}
 
 @media screen and (min-width: 1025px) {
   .reviews-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     padding: 2rem;
     justify-items: center;

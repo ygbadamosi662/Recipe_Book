@@ -1,5 +1,10 @@
 
-
+:root {
+  --mainColorLight: #27031e;
+  --mainColor: #a80863;
+  --secondaryColor: #e6d6e5;
+  --textColor: #000;
+}
 .recipe-main-container {
   display: flex;
   flex-direction: column;
@@ -40,6 +45,21 @@
 }
 .recipe-link{
   color: blue;
+}
+.fav-btn {
+  padding: 5px 10px;
+  background-color: var(--mainColorLight); 
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 10px;
+  transition: background-color 0.3s;
+  color: #fff;
+}
+
+button:hover {
+  background-color: var(--mainColor);
 }
 
 

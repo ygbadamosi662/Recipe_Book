@@ -15,7 +15,10 @@ const Reviews = () => {
             <img src={item.image} alt="logo.png" className="review-img" />
           </div>
           <div className="">
-            <p>{item.desc}</p>
+            <p className="review-names">{item.name}</p>
+            <p className="review-location">{item.location}</p>
+            <p className="review-rating">{item.rating}</p>
+            <p className="review-desc">{item.desc}</p>
             <span>{item.icon}</span>
           </div>
         </a>
