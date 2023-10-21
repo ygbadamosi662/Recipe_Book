@@ -9,9 +9,9 @@ const morgan = require('morgan');
  */
 const injectMalwares = (app) => {
   const origin = process.env.ALLOWED_ORIGIN;
+  console.log(process.env.ALLOWED_ORIGIN);
   // Enable cors
-  app
-   .use(cors({
+  app.use(cors({
       origin: origin,
       methods: 'GET,POST',
       credentials: true, // Include cookies in CORS requests

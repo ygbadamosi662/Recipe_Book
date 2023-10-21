@@ -39,11 +39,24 @@ class UserRepo {
     }
   }
 
+  async findByPhone(phone, select=[]) {
+    if (!phone) { return };
+    try {
+      let query = this._repo.findOne({ phone: phone});
+      if (select) {
+        query.select(select.join(' '));
+      }
+      const user = await query.exec();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async existsByPhone(phone) {
     if (!phone) { return };
     try {
-      let query = this._repo.exists({ phone: phone});
-      return await query.exec();
+      return await this._repo.exists({ phone: phone});
     } catch (error) {
       throw error;
     }
@@ -52,8 +65,7 @@ class UserRepo {
   async existsByEmail(email) {
     if (!email) { return };
     try {
-      let query = this._repo.exists({ email: email});
-      return await query.exec();
+      return await this._repo.exists({ email: email});
     } catch (error) {
       throw error;
     }

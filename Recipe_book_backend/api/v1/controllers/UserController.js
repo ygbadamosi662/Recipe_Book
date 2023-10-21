@@ -110,6 +110,7 @@ class UserController {
             message: `Invalid request, you already created a ${value.name} Recipe, update it if you want`,
           })
       }
+
       value.user = user;
       
       const recipe = await Recipe
@@ -434,34 +435,6 @@ class UserController {
       
       if (error) {
         throw error;
-      }
-
-      const fields = [
-        'name',
-        'ingredients',
-        'guide',
-        'inspiration',
-        'description',
-        'type',
-        'permit',
-      ];
-
-      const just_checking = () => {
-        const objectEntries = Object.entries(value);
-
-        for (const [key, value] of objectEntries) {
-          if (fields.includes(key)) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      // checks if any other field aside 
-      if (!just_checking()) {
-        return res
-          .status(400)
-          .json({ message: 'No data provided'});
       }
 
       if (value.faves === 'YES' ) {
@@ -988,31 +961,6 @@ class UserController {
         throw error;
       }
 
-      const fields = [
-        'comment',
-        'status',
-        'page',
-        'size',
-      ];
-
-      const just_checking = () => {
-        const objectEntries = Object.entries(value);
-
-        for (const [key, value] of objectEntries) {
-          if (fields.includes(key)) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      // checks if any other field aside 
-      if (!just_checking()) {
-        return res
-          .status(400)
-          .json({ message: 'No data provided'});
-      }
-
       const user_pr = user_repo.findByEmail(req.user.email, ['id']);
 
       // fill up filter
@@ -1045,16 +993,16 @@ class UserController {
         notification_repo.total_pages(filter, value.size), //get total pages
       ]);
 
-      const done = await gather_data_task;
+      const donezo = await gather_data_task;
       let result = [];
-      if (done[0]) {
+      if (donezo[0]) {
         // update notification status
         await Connection
           .transaction(async () => {
             let gather_task = [];
-            done[0].map((note) => {
+            donezo[0].map((note) => {
               note.status = Status.received;
-              gather_data_task.push(note.save());
+              gather_task.push(note.save());
             });
 
             result = await Promise.all(gather_task);
@@ -1068,11 +1016,12 @@ class UserController {
             return {
               id: note.id,
               comment: note.comment,
-              status: note.status
+              status: note.status,
+              subject: note.subject
             };
           }) : [],
-          have_next_page: done[1],
-          total_pages: done[2]
+          have_next_page: donezo[1],
+          total_pages: donezo[2]
         });
     } catch (error) {
       

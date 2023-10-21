@@ -59,8 +59,8 @@ class AppController {
 
     // handle integrity
     if (resolves[0] || resolves[1]) {
-      if (resolves[0]) { response.status(400).json({ Error: 'Email exists'}); }
-      if (resolves[1]) { response.status(400).json({ Error: 'Phone exists'}); }
+      if (resolves[0]) { return response.status(400).json({ Error: 'Email exists'}); }
+      if (resolves[1]) { return response.status(400).json({ Error: 'Phone exists'}); }
     }
     
    
@@ -81,7 +81,10 @@ class AppController {
     const resoled_u = await user_repo.create_user(user);
     return response
       .status(201)
-      .json({user: resoled_u});
+      .json({user: {
+        email: resoled_u.email,
+        phone: resoled_u.phone
+      }});
     } catch (error) {
 
       if (error instanceof MongooseError) {
@@ -95,15 +98,19 @@ class AppController {
         });
       }
       console.log(error);
-      return res.status(500).json({error: error.message});
+      return response.status(500).json({error: error.message});
     }
   }
 
   static async login(req, response) {
     try {
       const schema = Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().required(),
+        email_or_phone: Joi
+          .string()
+          .required(),
+        password: Joi
+          .string()
+          .required(),
       });
     
       // validate body
@@ -112,20 +119,24 @@ class AppController {
       if (error) {
         throw error;
       }
-
-      const user = await user_repo.findByEmail(value.email, ['name', 'password', 'role', 'id']);
-
+      let user = {}
+      
+      user = await user_repo.findByEmail(value.email_or_phone, ['name', 'password', 'role', 'id', 'email']);
+      if(!user) {
+        user = await user_repo.findByPhone(value.email_or_phone, ['name', 'password', 'role', 'id', 'email']);
+      }
+      
       const is_pwd = await util.validate_pwd(value.password, user.password);
 
       // validate user
       if (!user || ( is_pwd === false)) {
         return response.status(400).json({
-          error: 'email or password incorrect',
+          error: 'email/phone or password incorrect',
         });
       }
 
       const token = await jwt_service.generate_token({
-        email: value.email,
+        email: user.email,
         role: user.role,
         id: user.id,
       });
@@ -134,17 +145,21 @@ class AppController {
         .status(200)
         .json({
           message: 'Login succesful',
-          user: user.id,
+          user: {
+            id: user._id,
+            role: user.role,
+            name: user.name,
+          },
           token: token,
         });
       
     } catch (error) {
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
-        return res.status(500).json({error: error.message});
+        return response.status(500).json({error: error.message});
       }
       if (error instanceof Joi.ValidationError) {
-        return res
+        return response
           .status(400)
           .json({
             error: 'Invalid request body',
@@ -152,7 +167,7 @@ class AppController {
           });
       }
       console.log(error);
-      return res.status(500).json({error: error.message});
+      return response.status(500).json({error: error.message});
     }
   }
 

@@ -39,21 +39,11 @@ class RecipeRepo {
     delete obj.page;
     delete obj.size;
 
-    // if recipe.ingredients is set
-    if (obj['ingredients']) {
-      obj.ingredients = { $in: obj['ingredients']};
-    }
-    // if recipe.guide is set
-    if (obj['guide']) {
-      obj.guide = { $in: obj['guide']};
-    }
-
     const recs =  await this._repo
       .find(obj)
       .skip((page - 1) * PAGE_SIZE)
       .limit(PAGE_SIZE)
       .exec();
-    console.log(recs)
     return recs;
   }
 
