@@ -20,9 +20,10 @@ const Permit = {
 };
 
 const Status = {
-    sent: 'SENT',
-    received: 'RECEIVED',
-    read: 'READ',
+  sent: 'SENT',
+  received: 'RECEIVED',
+  read: 'READ',
+  not_read: "not read" // used to get not read notifications
 }
 
 const Which = {

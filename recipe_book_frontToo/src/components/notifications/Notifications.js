@@ -1,10 +1,10 @@
 import React from "react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
-// import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { logNotifications } from "../../Redux/Notification/notificationActions";
 import { getMyNotifications, ADMIN_getNotifications } from "../../api_calls";
+import { toast } from "react-toastify";
 import "./Notifications.css";
 
 function Notifications({ payload, pack, reduxLogNotifications }) {
@@ -16,7 +16,6 @@ function Notifications({ payload, pack, reduxLogNotifications }) {
 
   const {
     mutate: getOrder,
-    isLoading,
     isError,
     error,
     data,
@@ -30,34 +29,28 @@ function Notifications({ payload, pack, reduxLogNotifications }) {
   }, []);
   // payload, getOrder, data?.status, reduxLogNotifications, data?.data.notes
 
-  if((!payload) && (!Object.keys(orders).includes(pack))) {
-    return <div>
-             Incomplete Request
-           </div>
+  if((!Object.keys(orders).includes(pack))) {
+    toast.error("Incomplete request", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
   }
-  
-  if(isLoading)
-  {
-    return <h2>Loading...</h2>
-  }
-
-
-  const notes = data?.data.notes;
 
   if(isError)
   {
     if ((error?.response.status === 400) || (error?.response.status === 401)) {
-      return <div className="four-hundred-error">
-                <h4>{`Bad Request: ${error?.response.data.message}`}</h4>
-             </div> 
+      toast.error(`Bad Request: ${error?.response.data.msg}`, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
     if ((error?.response.status >= 500)) {
-      return <div className="five-hundred-error">
-                <h4>{'Server Error'}</h4>
-             </div> 
+      toast.error('Server Error', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
-    console.log(error)
   }
+
+
+  const notes = data?.data.notes;
 
 //   const onClick = () => {
 //     navigate('/reviews', { id: id});

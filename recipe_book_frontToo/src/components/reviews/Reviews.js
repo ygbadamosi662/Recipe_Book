@@ -5,6 +5,7 @@ import { useMutation } from "react-query";
 import { connect } from "react-redux";
 import { logReviews } from "../../Redux/Review/reviewActions";
 import { getRecipeReviews, ADMIN_getReviews } from "../../api_calls";
+import { toast } from "react-toastify";
 import "./Reviews.css";
 
 function Reviews({ payload, pack, reduxLogReviews }) {
@@ -15,7 +16,6 @@ function Reviews({ payload, pack, reduxLogReviews }) {
 
   const {
     mutate: getOrder,
-    isLoading,
     isError,
     error,
     data,
@@ -25,37 +25,31 @@ function Reviews({ payload, pack, reduxLogReviews }) {
     getOrder(payload)
   },[pack, payload, getOrder]);
 
-  if((!payload) && (!Object.keys(orders).includes(pack))) {
-    return <div>
-             Incomplete Request
-           </div>
+  if(!Object.keys(orders).includes(pack)) {
+    toast.error("Incomplete request", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
   }
   
-  if(isLoading)
-  {
-    return <h2>Loading...</h2>
-  }
-
   if (data?.status === 200) {
     reduxLogReviews(data?.data.recipes);
   }
 
-  const reviews = data?.data.reviews;
-
   if(isError)
   {
     if ((error?.response.status === 400) || (error?.response.status === 401)) {
-      return <div className="four-hundred-error">
-                <h4>{`Bad Request: ${error?.response.data.msg}`}</h4>
-             </div> 
+      toast.error(`Bad Request: ${error?.response.data.msg}`, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
     if ((error?.response.status >= 500)) {
-      return <div className="five-hundred-error">
-                <h4>{'Server Error'}</h4>
-             </div> 
+      toast.error("Server error", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
-    console.log(error)
   }
+
+  const reviews = data?.data.reviews;
 
 //   const onClick = () => {
 //     navigate('/reviews', { id: id});

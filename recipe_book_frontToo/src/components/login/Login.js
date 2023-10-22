@@ -1,42 +1,20 @@
 import React from "react";
-import { useEffect } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FormikControl from "../../FormikControl";
-import { useMutation } from "react-query";
 import { setToken } from "../../appAuth";
 import { setAuthHeader } from "../../appAxios";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { logUser } from "../../Redux/User/userActions";
+import { toast } from "react-toastify";
 import { login } from "../../api_calls";
 import "./Login.css";
 
 function Login(props) {
   const {reduxLogUser} = props;
 
-  const {
-    mutate: LogIn,
-    isLoading,
-    isError,
-    error,
-    data,
-  } = useMutation(login);
-
   const navigate = useNavigate();
-
-  // const toHome = () => {
-  //   navigate('/home');
-  // }
-
-  useEffect(() => {
-    if (data?.status === 200) {
-      setToken(data?.data.token);
-      setAuthHeader()
-      reduxLogUser(data?.data.user);
-      navigate('/user/dash');
-    }
-  });
 
   const initVal = {
     email_or_phone: "",
@@ -53,25 +31,33 @@ function Login(props) {
       .required("Required"),
   });
 
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     const { email_or_phone, password } = values;
     const user = {
       email_or_phone: email_or_phone,
       password: password,
     };
-
-    LogIn(user);
+    
+    try {
+      const res = await login(user);
+      setToken(res.data.token);
+      setAuthHeader()
+      reduxLogUser(res.data.user);
+      navigate('/user/dash');
+    } catch (error) {
+      if(error.response) {
+        console.log(error.response.data.msg)
+        toast.error(error.response.data.msg, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        return;
+      }
+      // Handle network errors or display an error message to the user
+      toast.error("Network error. Please try again later.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
   };
-
-  if(isLoading)
-  {
-    return <h2>Loading...</h2>
-  }
-
-  if(isError)
-  {
-    console.log(error)
-  }
 
   return (
     <Formik
@@ -101,7 +87,6 @@ function Login(props) {
           >
             Login
           </button>
-          {/* <h2>{head}</h2> */}
         </Form>
       )}
     </Formik>
@@ -110,7 +95,6 @@ function Login(props) {
 
 const mapStateToProps = state => {
   return {
-    // gets user email if set
     reduxUser: state.user.user
   }
 }

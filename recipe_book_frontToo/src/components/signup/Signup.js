@@ -1,32 +1,17 @@
 import React from "react";
-import { useEffect } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FormikControl from "../../FormikControl";
-import { useMutation } from "react-query";
 import { connect } from "react-redux";
 import { logUser } from "../../Redux/User/userActions";
 import { register } from "../../api_calls";
+import { toast } from "react-toastify";
 import "./Signup.css";
 
 
 function Signup(props) {
   const {reduxLogUser, goL, reduxUser} = props;
   
-  const {
-    mutate: addUser,
-    isLoading,
-    isError,
-    error,
-    data} = useMutation(register);
-  
-  useEffect(() => {
-    if (data?.status === 201) {
-      // swicthes to the login page
-      goL();
-    }
-  }, [data, reduxLogUser, goL]);
-
   // Formik initial values
   let initVal = {};
   
@@ -69,7 +54,7 @@ function Signup(props) {
   });
 
   // handles form submission
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     const {fname, lname, email, password, phone} = values
     const user = {
       'fname': fname,
@@ -78,24 +63,25 @@ function Signup(props) {
       'password': password,
       'phone': phone
     }
-    reduxLogUser(user);
-    addUser(user)
-    // console.log(values);
-  }
-
-  if(isLoading)
-  {
-    return <h2>Loading...</h2>
-  }
-
-  if(isError)
-  {
-    if (error?.response.status === 400) {
-      return <div className="integrity-err">
-                <h4>{`Bad Request: ${error?.response.data.Error}, Login 👉 instead`}</h4>
-             </div> 
+    
+    try {
+      const res = await register(user);
+      reduxLogUser(res.data.user);
+      goL();
+    } catch (error) {
+      if(error.response) {
+        if(error.response.status === 400) {
+          toast.error(`${error.response.data.msg}: Sign in instead?`, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          return;
+        }
+      }
+      // Handle network errors or display an error message to the user
+      toast.error("Network error. Please try again later.", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
-    // console.log(error)
   }
 
   return (

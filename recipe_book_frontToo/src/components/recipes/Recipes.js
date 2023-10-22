@@ -1,15 +1,14 @@
 import React from "react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
-// import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { logRecipes } from "../../Redux/Recipe/recipeActions";
 import { getMyRecipes, getRecipes, ADMIN_getRecipes } from "../../api_calls";
+import { toast } from "react-toastify";
 import "./Recipes.css";
 
 function Recipes({ payload, pack, reduxLogRecipes}) {
   
-
   const orders = {
     user_recipes: getRecipes,
     user_myRecipes: getMyRecipes,
@@ -18,7 +17,6 @@ function Recipes({ payload, pack, reduxLogRecipes}) {
 
   const {
     mutate: getOrder,
-    isLoading,
     isError,
     error,
     data,
@@ -29,15 +27,10 @@ function Recipes({ payload, pack, reduxLogRecipes}) {
     getOrder(payload)
   },[pack, payload, getOrder]);
 
-  if((!payload) && (!Object.keys(orders).includes(pack))) {
-    return <div>
-             Incomplete Request
-           </div>
-  }
-  
-  if(isLoading)
-  {
-    return <h2>Loading...</h2>
+  if(!Object.keys(orders).includes(pack)) {
+    toast.error("Incomplete request", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
   }
 
   if (data?.status === 200) {
@@ -49,16 +42,15 @@ function Recipes({ payload, pack, reduxLogRecipes}) {
   if(isError)
   {
     if ((error?.response.status === 400) || (error?.response.status === 401)) {
-      return <div className="four-hundred-error">
-                <h4>{`Bad Request: ${error?.response.data.msg}`}</h4>
-             </div> 
+      toast.error(`Bad Request: ${error?.response.data.msg}`, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
     if ((error?.response.status >= 500)) {
-      return <div className="five-hundred-error">
-                <h4>{'Server Error'}</h4>
-             </div> 
+      toast.error('Server Error', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
-    console.log(error)
   }
 
 //   const onClick = () => {

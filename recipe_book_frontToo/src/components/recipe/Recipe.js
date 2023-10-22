@@ -1,11 +1,10 @@
 import React from "react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
-// import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
 import { getRecipe } from "../../api_calls";
-
+import { toast } from "react-toastify";
 import "./Recipe.css";
 
 function Recipe({ id, reduxLogRecipe}) {
@@ -23,14 +22,29 @@ function Recipe({ id, reduxLogRecipe}) {
   },[id, fetchRecipe]);
 
   if(!id) {
-    return <div>
-             id is required
-           </div>
+    toast.error("id is required", {
+      position: toast.POSITION.TOP_RIGHT,
+    });
   }
   
   if(isLoading)
   {
     return <h2>Loading...</h2>
+  }
+
+  if(isError)
+  {
+    if(error?.response.status === 400) {
+      toast.error(`Bad Request: ${error?.response.data.msg}`, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    if(error?.response.status >= 500) {
+      toast.error("Server Error ", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    
   }
 
   if (data?.status === 200) {
@@ -39,15 +53,7 @@ function Recipe({ id, reduxLogRecipe}) {
 
   const recipe = data?.data.recipe;
 
-  if(isError)
-  {
-    if ((error?.response.status === 400) || (error?.response.status === 401)) {
-      return <div className="four-hundred-error">
-                <h4>{`Bad Request: ${error?.response.data.msg}`}</h4>
-             </div> 
-    }
-    console.log(error)
-  }
+  
 
 //   const onClick = () => {
 //     navigate('/reviews', { id: id});

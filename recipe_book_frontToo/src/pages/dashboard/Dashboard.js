@@ -7,8 +7,8 @@ import Recipe from "../../components/recipe/Recipe";
 // import Notifications from "../../components/notifications/Notifications";
 
 
-
 const Dashboard = ({ reduxUser }) => {
+  // JUST TO TEST MY COMPONENTS FOR NOW
   // const filter = {
   //   count: false,
   //   status: "RECEIVED",

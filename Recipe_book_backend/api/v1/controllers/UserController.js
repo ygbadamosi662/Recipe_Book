@@ -966,8 +966,21 @@ class UserController {
       // fill up filter
       let filter = {};
       if(value.comment) { filter.comment = new RegExp(`${value['comment']}`); }
-      if(value.status) { filter.status = value.status; }
+      if(value.status) { 
+        if(value.status === Status.not_read) {
+          filter.$or = [{ status: Status.received }, {status: Status.sent }];
+        } else {
+          filter.status = value.status;
+        }
+      }
       const user = await user_pr;
+      if(!user) {
+        return res
+          .status(500)
+          .json({
+            msg: "Cant find jwt user"
+          });
+      }
       filter.user = user;
 
       // if count is true, consumer just wants a count of the filtered documents
@@ -1001,8 +1014,10 @@ class UserController {
           .transaction(async () => {
             let gather_task = [];
             donezo[0].map((note) => {
-              note.status = Status.received;
-              gather_task.push(note.save());
+              if(note.status === Status.sent) {
+                note.status = Status.received;
+                gather_task.push(note.save());
+              }
             });
 
             result = await Promise.all(gather_task);
@@ -1023,6 +1038,50 @@ class UserController {
           have_next_page: donezo[1],
           total_pages: donezo[2]
         });
+    } catch (error) {
+      
+      if (error instanceof MongooseError) {
+        console.log('We have a mongoose problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      if (error instanceof JsonWebTokenErro) {
+        console.log('We have a jwt problem', error.message);
+        return res.status(500).json({error: error.message});
+      }
+      console.log(error);
+      return res.status(500).json({error: error.message});
+    }
+  }
+
+  static async read_notifications(req, res) {
+    try {
+      const schema = Joi.object({
+        ids: Joi
+          .array()
+          .items(Joi.string())
+          .required()
+      });
+
+      // validate body
+      const { value, error } = schema.validate(req.body);
+      
+      if (error) {
+        throw error;
+      }
+
+      await Connection
+        .transaction(async () => {
+          let gather_task = [];
+          value.ids.map((id) => {
+           gather_task.push(Notification.findByIdAndUpdate(id, { status: Status.read }));
+          });
+          await Promise.all(gather_task);
+        });
+
+      return res
+        .status(200)
+        .json({ msg: "Update successful"});
+
     } catch (error) {
       
       if (error instanceof MongooseError) {

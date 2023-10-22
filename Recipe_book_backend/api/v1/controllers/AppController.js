@@ -59,8 +59,8 @@ class AppController {
 
     // handle integrity
     if (resolves[0] || resolves[1]) {
-      if (resolves[0]) { return response.status(400).json({ Error: 'Email exists'}); }
-      if (resolves[1]) { return response.status(400).json({ Error: 'Phone exists'}); }
+      if (resolves[0]) { return response.status(400).json({ msg: 'Email exists'}); }
+      if (resolves[1]) { return response.status(400).json({ msg: 'Phone exists'}); }
     }
     
    
@@ -89,16 +89,16 @@ class AppController {
 
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
-        return response.status(500).json({error: error.message});
+        return response.status(500).json({msg: error.message});
       }
       if (error instanceof Joi.ValidationError) {
         return response.status(400).json({
-          error: 'Invalid request body',
+          msg: 'Invalid request body',
           errors: error.details,
         });
       }
       console.log(error);
-      return response.status(500).json({error: error.message});
+      return response.status(500).json({msg: error.message});
     }
   }
 
@@ -125,13 +125,18 @@ class AppController {
       if(!user) {
         user = await user_repo.findByPhone(value.email_or_phone, ['name', 'password', 'role', 'id', 'email']);
       }
-      
+      // validate user
+      if (!user) {
+        return response.status(400).json({
+          msg: 'email/phone or password incorrect',
+        });
+      }
       const is_pwd = await util.validate_pwd(value.password, user.password);
 
       // validate user
-      if (!user || ( is_pwd === false)) {
+      if (is_pwd === false) {
         return response.status(400).json({
-          error: 'email/phone or password incorrect',
+          msg: 'email/phone or password incorrect',
         });
       }
 
@@ -156,7 +161,7 @@ class AppController {
     } catch (error) {
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
-        return response.status(500).json({error: error.message});
+        return response.status(500).json({msg: error.message});
       }
       if (error instanceof Joi.ValidationError) {
         return response
@@ -167,7 +172,7 @@ class AppController {
           });
       }
       console.log(error);
-      return response.status(500).json({error: error.message});
+      return response.status(500).json({msg: error.message});
     }
   }
 
@@ -189,17 +194,17 @@ class AppController {
       return response
         .status(200)
         .json({
-          message: 'Logged out succesfully',
+          msg: 'Logged out succesfully',
           token: token,
         });
       
     } catch (error) {
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
-        return res.status(500).json({error: error.message});
+        return res.status(500).json({msg: error.message});
       }
       console.log(error);
-      return response.status(500).json({error: error.message});
+      return response.status(500).json({msg: error.message});
     }
   }
 
