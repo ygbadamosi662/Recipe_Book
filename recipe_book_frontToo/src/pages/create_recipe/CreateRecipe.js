@@ -6,25 +6,24 @@ import FormikControl from "../../FormikControl";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { createRecipe } from "../../api_calls";
-import { logRecipe } from "../../Redux/Recipe/recipeActions"
+import { logRecipe } from "../../Redux/Recipe/recipeActions";
 import "./CreateRecipe.css";
 
 const styles = {
-//   style form here
+  //   style form here
   form: {
-    display: 'grid',
-    borderRadius: '0.5rem',
-    color: 'white'
-
-  }
+    display: "grid",
+    borderRadius: "0.5rem",
+    color: "white",
+  },
 };
 function CreateRecipe({ reduxLogRecipe }) {
   const navigate = useNavigate();
 
   const permit = [
-    {key: "Access", value: ""},
-    {key: "PUBLIC", value: "PUBLIC"},
-    {key: "PRIVATE", value: "PRIVATE"},
+    { key: "Access", value: "" },
+    { key: "PUBLIC", value: "PUBLIC" },
+    { key: "PRIVATE", value: "PRIVATE" },
   ];
 
   const form_init_value = {
@@ -33,43 +32,37 @@ function CreateRecipe({ reduxLogRecipe }) {
     guide: "",
     description: "",
     type: "",
-    permit: ""
+    permit: "",
   };
 
   const validationSchema = Yup.object({
-    name: Yup
-      .string()
-      .required(),
-    type: Yup
-      .string()
+    name: Yup.string().required(),
+    type: Yup.string().required("Required"),
+    guide: Yup.string()
+      .test(
+        "min-words",
+        "Preparation should be longer, unless you want ppl to cook rubbish",
+        (value) => {
+          if (!value) return true; // If the field is empty, no validation needed
+          const wordCount = value
+            .split(/\s+/)
+            .filter((word) => word.trim() !== "").length;
+          return wordCount >= 5;
+        }
+      )
       .required("Required"),
-    guide: Yup
-      .string()
-      .test('min-words', 'Preparation should be longer, unless you want ppl to cook rubbish', (value) => {
-        if (!value) return true; // If the field is empty, no validation needed
-        const wordCount = value.split(/\s+/).filter((word) => word.trim() !== '').length;
-        return wordCount >= 5;
-      })
-      .required("Required"),
-    description: Yup
-      .string()
-      .required("Required"),
-    permit: Yup
-      .string()
-      .oneOf(["PUBLIC", "PRIVATE"])
-      .required("Required"),
-    ingredients: Yup
-      .string()
-      .test({
-        name: 'ingridient-validation',
-        message: 'too few ingredients',
-        test: (value) => {
-            if(value) {
-              return value.split(",").length > 1;
-            }
-            return false;
-          },
-      }),
+    description: Yup.string().required("Required"),
+    permit: Yup.string().oneOf(["PUBLIC", "PRIVATE"]).required("Required"),
+    ingredients: Yup.string().test({
+      name: "ingridient-validation",
+      message: "too few ingredients",
+      test: (value) => {
+        if (value) {
+          return value.split(",").length > 1;
+        }
+        return false;
+      },
+    }),
   });
 
   const handleSubmit = async (values) => {
@@ -80,21 +73,20 @@ function CreateRecipe({ reduxLogRecipe }) {
       description: description,
       permit: permit,
       ingredients: ingredients.split(","),
-      guide: guide
     };
-    
+
     try {
       const res = await createRecipe(JSON.stringify(recipe));
       if (res.status === 201) {
         toast.success(res.data.msg, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
+          position: toast.POSITION.TOP_RIGHT,
+        });
         reduxLogRecipe(res.data.recipe);
-        navigate('/user/dash');
+        navigate("/user/dash");
       }
     } catch (error) {
-      if(error.response) {
-        console.log(error.response.data.msg)
+      if (error.response) {
+        console.log(error.response.data.msg);
         toast.error(error.response.data.msg, {
           position: toast.POSITION.TOP_RIGHT,
         });
@@ -106,7 +98,7 @@ function CreateRecipe({ reduxLogRecipe }) {
       });
     }
   };
-  
+
   return (
     <Formik
       onSubmit={handleSubmit}
@@ -120,6 +112,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Recipe Name"
             name="name"
+            className="input"
           />
 
           <FormikControl
@@ -127,6 +120,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Describe Recipe"
             name="description"
+            className="input"
           />
 
           <FormikControl
@@ -134,6 +128,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Type"
             name="type"
+            className="input"
           />
 
           <FormikControl
@@ -141,19 +136,24 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Ingredients, seperated by a ',' comma"
             name="ingredients"
+            className="input"
           />
 
           <FormikControl
             control="text-area"
             label="Preparation"
             name="guide"
+            className="input"
           />
+
+          <FormikControl control="text-area" label="Preparation" name="guide" />
 
           <FormikControl
             control="select"
             options={permit}
             label="Access"
             name="permit"
+            className="input"
           />
 
           <button
@@ -169,10 +169,10 @@ function CreateRecipe({ reduxLogRecipe }) {
   );
 }
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    reduxLogRecipe: (rec) => dispatch(logRecipe(rec))
-  }
+    reduxLogRecipe: (rec) => dispatch(logRecipe(rec)),
+  };
 };
 
 export default connect(null, mapDispatchToProps)(CreateRecipe);
