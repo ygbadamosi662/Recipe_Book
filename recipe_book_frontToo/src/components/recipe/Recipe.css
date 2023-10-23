@@ -1,1 +1,64 @@
- 
+/* styles.css */
+.recipe {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-owner {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.recipe h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* Adds spacing between meta information */
+}
+
+.info {
+  flex: 1;
+}
+
+.info label {
+  font-weight: bold;
+}
+
+.recipe-ingredients {
+  margin-top: 1rem;
+}
+
+.recipe-ingredients h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.recipe-guides {
+  margin-top: 1rem;
+}
+
+.recipe-guides p {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
