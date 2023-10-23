@@ -29,6 +29,7 @@ function CreateRecipe({ reduxLogRecipe }) {
   const form_init_value = {
     name: "",
     ingredients: "",
+    guide: "",
     description: "",
     type: "",
     permit: "",
@@ -37,6 +38,19 @@ function CreateRecipe({ reduxLogRecipe }) {
   const validationSchema = Yup.object({
     name: Yup.string().required(),
     type: Yup.string().required("Required"),
+    guide: Yup.string()
+      .test(
+        "min-words",
+        "Preparation should be longer, unless you want ppl to cook rubbish",
+        (value) => {
+          if (!value) return true; // If the field is empty, no validation needed
+          const wordCount = value
+            .split(/\s+/)
+            .filter((word) => word.trim() !== "").length;
+          return wordCount >= 5;
+        }
+      )
+      .required("Required"),
     description: Yup.string().required("Required"),
     permit: Yup.string().oneOf(["PUBLIC", "PRIVATE"]).required("Required"),
     ingredients: Yup.string().test({
@@ -52,13 +66,14 @@ function CreateRecipe({ reduxLogRecipe }) {
   });
 
   const handleSubmit = async (values) => {
-    const { name, ingredients, description, type, permit } = values;
+    const { name, ingredients, description, type, permit, guide } = values;
     const recipe = {
       name: name,
       type: type.toUpperCase(),
       description: description,
       permit: permit,
       ingredients: ingredients.split(","),
+      guide: guide,
     };
 
     try {
@@ -122,6 +137,13 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Ingredients, seperated by a ',' comma"
             name="ingredients"
+            className="input"
+          />
+
+          <FormikControl
+            control="text-area"
+            label="Preparation"
+            name="guide"
             className="input"
           />
 
