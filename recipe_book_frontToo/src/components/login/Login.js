@@ -5,13 +5,13 @@ import FormikControl from "../../FormikControl";
 import { setToken } from "../../appAuth";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
-import { logUser } from "../../Redux/User/userActions";
+import { logUser, logNot_Auth } from "../../Redux/User/userActions";
 import { toast } from "react-toastify";
 import { login } from "../../api_calls";
 import "./Login.css";
 
 function Login(props) {
-  const { reduxLogUser } = props;
+  const { reduxLogUser, reduxLogNotAuth } = props;
 
   const navigate = useNavigate();
 
@@ -44,6 +44,7 @@ function Login(props) {
       toast.success(res.data.msg, {
         position: toast.POSITION.TOP_RIGHT,
       });
+      reduxLogNotAuth();
       navigate("/user/dash");
     } catch (error) {
       if (error.response) {
@@ -106,6 +107,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     reduxLogUser: (user) => dispatch(logUser(user)),
+    reduxLogNotAuth: () => dispatch(logNot_Auth()),
   };
 };
 

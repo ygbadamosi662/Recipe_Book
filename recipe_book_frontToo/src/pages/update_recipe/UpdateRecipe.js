@@ -1,62 +1,60 @@
-import React from "react";
+import React from 'react';
 import { connect } from "react-redux";
+import { logRecipe } from '../../Redux/Recipe/recipeActions';
+import { toast } from "react-toastify";
+import { updateRecipe } from '../../api_calls';
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FormikControl from "../../FormikControl";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { createRecipe } from "../../api_calls";
-import { logRecipe } from "../../Redux/Recipe/recipeActions"
-import "./CreateRecipe.css";
 
-const styles = {
-//   style form here
-  form: {
-    display: 'grid',
-    borderRadius: '0.5rem',
-    color: 'white'
+function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
+  const which_permit = () => {
+    if(reduxRecipe.permit === "PRIVATE") {
+      return "PUBLIC";
+    }
+    if(reduxRecipe.permit === "PUBLIC") {
+      return "PRIVATE";
+    }
+  };
 
-  }
-};
-function CreateRecipe({ reduxLogRecipe }) {
-  const navigate = useNavigate();
-
+  const init_permit = which_permit()
   const permit = [
-    {key: "Access", value: ""},
-    {key: "PUBLIC", value: "PUBLIC"},
-    {key: "PRIVATE", value: "PRIVATE"},
+    {
+      key: reduxRecipe.permit,
+      value: reduxRecipe.permit
+    },
+    { 
+      key: init_permit,
+      value: init_permit
+    },
   ];
 
   const form_init_value = {
-    name: "",
-    ingredients: "",
-    guide: "",
-    description: "",
-    type: "",
-    permit: ""
+    name: reduxRecipe.name,
+    ingredients: reduxRecipe.ingredients.join(","),
+    description: reduxRecipe.description,
+    type: reduxRecipe.type,
+    permit: reduxRecipe.permit,
+    guide: reduxRecipe.guide
   };
 
   const validationSchema = Yup.object({
     name: Yup
-      .string()
-      .required(),
+      .string(),
     type: Yup
+      .string(),
+    description: Yup
+      .string(),
+    permit: Yup
       .string()
-      .required("Required"),
+      .oneOf(["PUBLIC", "PRIVATE"]),
     guide: Yup
       .string()
       .test('min-words', 'Preparation should be longer, unless you want ppl to cook rubbish', (value) => {
         if (!value) return true; // If the field is empty, no validation needed
         const wordCount = value.split(/\s+/).filter((word) => word.trim() !== '').length;
-        return wordCount >= 5;
+        return wordCount >= 50;
       })
-      .required("Required"),
-    description: Yup
-      .string()
-      .required("Required"),
-    permit: Yup
-      .string()
-      .oneOf(["PUBLIC", "PRIVATE"])
       .required("Required"),
     ingredients: Yup
       .string()
@@ -73,40 +71,64 @@ function CreateRecipe({ reduxLogRecipe }) {
   });
 
   const handleSubmit = async (values) => {
-    const { name, ingredients, description, type, permit, guide } = values;
-    const recipe = {
-      name: name,
-      type: type.toUpperCase(),
-      description: description,
-      permit: permit,
-      ingredients: ingredients.split(","),
-      guide: guide
-    };
-    
     try {
-      const res = await createRecipe(JSON.stringify(recipe));
+      // if no changes made
+      values.type.toUpperCase();
+      if(values === form_init_value) {
+        toast.success("No changes made", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        return;
+      }
+
+      const { name, ingredients, description, type, permit, guide } = values;
+
+      // build query
+      let query = {};
+      query.id = reduxRecipe._id;
+      if(name) {
+        query.name = name;
+      }
+      if(type) {
+        query.type = type;
+      }
+      if(description) {
+        query.description = description;
+      }
+      if(guide) {
+        query.guide = guide;
+      }
+      if(permit) {
+        query.permit = permit;
+      }
+      if(ingredients) {
+        query.ingredients = ingredients.split(",");
+      }
+      const res = await updateRecipe(JSON.stringify(query));
       if (res.status === 201) {
         toast.success(res.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
           });
         reduxLogRecipe(res.data.recipe);
-        navigate('/user/dash');
       }
     } catch (error) {
       if(error.response) {
-        console.log(error.response.data.msg)
-        toast.error(error.response.data.msg, {
+        if(error.response.status === 400) {
+          toast.error(error.response.data.msg, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          return;
+        }
+        // Handle network errors or display an error message to the user
+        toast.error("Network error. Please try again later.", {
           position: toast.POSITION.TOP_RIGHT,
         });
         return;
       }
-      // Handle network errors or display an error message to the user
-      toast.error("Network error. Please try again later.", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      console.log(error);
     }
   };
-  
+
   return (
     <Formik
       onSubmit={handleSubmit}
@@ -114,7 +136,7 @@ function CreateRecipe({ reduxLogRecipe }) {
       validationSchema={validationSchema}
     >
       {(formik) => (
-        <Form className="recipe-form" style={styles.form}>
+        <Form className="recipe-form">
           <FormikControl
             control="input"
             type="text"
@@ -125,7 +147,7 @@ function CreateRecipe({ reduxLogRecipe }) {
           <FormikControl
             control="input"
             type="text"
-            label="Describe Recipe"
+            label="Recipe Description"
             name="description"
           />
 
@@ -161,7 +183,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             disabled={!formik.isValid || formik.isSubmitting}
             className="submit-btn"
           >
-            Create
+            Save Changes
           </button>
         </Form>
       )}
@@ -169,10 +191,16 @@ function CreateRecipe({ reduxLogRecipe }) {
   );
 }
 
+const mapStateToProps = state => {
+  return {
+    reduxRecipe: state.recipe.recipe
+  }
+}
+
 const mapDispatchToProps = dispatch => {
   return {
     reduxLogRecipe: (rec) => dispatch(logRecipe(rec))
   }
-};
+}
 
-export default connect(null, mapDispatchToProps)(CreateRecipe);
+export default connect(mapStateToProps, mapDispatchToProps)(UpdateRecipe);

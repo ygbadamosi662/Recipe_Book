@@ -4,14 +4,16 @@ import { FaBell } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import HamburgerMenu from "./HamburgerMenu";
 import { getMyNotifications } from "../../api_calls";
+import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import "./Navbar.css";
 
 
 //Navbar Component
-function Navbar() {
+function Navbar({ reduxUserNotAuth }) {
 //   const navRef = useRef();
   //checks user authentication
+
   const auth = localStorage.getItem("Jwt") ? true : false;
   
   const navigate = useNavigate();
@@ -52,7 +54,7 @@ function Navbar() {
 
   return (
     <header className="nav">
-      {auth ? (
+      {(auth && (reduxUserNotAuth === false)) ? (
           <div className="auth">
             <div className="home">
               <button className="home-btn" onClick={take_home_page} type="button">
@@ -80,4 +82,10 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+const mapStateToProps = state => {
+  return {
+    reduxUserNotAuth: state.user.not_auth
+  }
+}
+
+export default connect(mapStateToProps, null)(Navbar);

@@ -3,6 +3,7 @@ import InputField from "./FormElements/InputField";
 import SelectField from "./FormElements/SelectField";
 import CheckboxField from "./FormElements/CheckboxField";
 import DatePicker from "./FormElements/DatePicker";
+import TextAreaField from "./FormElements/TextAreaField"
 
 function FormikControl(props) {
   const { control, ...rest } = props;
@@ -16,6 +17,8 @@ function FormikControl(props) {
       return <CheckboxField {...rest} />;
     case "date":
       return <DatePicker {...rest}/>
+    case "text-area":
+      return <TextAreaField {...rest}/>
     default:
       return null;
   }

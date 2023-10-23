@@ -14,8 +14,8 @@ const recipeSchema = new Schema({
   inspiration: String
   ,
   guide: {
-    type: [String],
-    default: []
+    type: String,
+    required: true,
   },
   description: String,
   user: {
