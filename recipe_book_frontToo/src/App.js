@@ -13,7 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const appStylez = {
-  // backgroundColor: 'rgb(68,70,84)',
+  //backgroundColor: "#FAF9F6",
   height: "100vh",
 };
 

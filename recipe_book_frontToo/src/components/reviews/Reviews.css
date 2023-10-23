@@ -1,0 +1,31 @@
+/* styles.css */
+.reviews {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.review {
+  width: 100%;
+  max-width: 400px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review-writer {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.review-comment {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-stars {
+  font-size: 1.2rem;
+  color: #ffd700; /* Yellow color for stars */
+}
