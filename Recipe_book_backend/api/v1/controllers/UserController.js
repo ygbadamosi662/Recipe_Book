@@ -75,8 +75,8 @@ class UserController {
           .items(Joi.string())
           .required(),
         guide: Joi
-          .array()
-          .items(Joi.string()),
+          .string()
+          .required(),
         description: Joi
           .string(),
         inspiration: Joi.string(),
@@ -161,8 +161,7 @@ class UserController {
           .array()
           .items(Joi.string()),
         guide: Joi
-          .array()
-          .items(Joi.string()),
+          .string(),
         inspiration: Joi
           .string(),
         description: Joi
@@ -206,7 +205,7 @@ class UserController {
       if (!just_checking()) {
         return res
           .status(400)
-          .json({ message: 'No data provided for update'});
+          .json({ msg: 'No data provided for update'});
       }
 
       const rec = await Recipe.findById(value.id);
@@ -215,7 +214,7 @@ class UserController {
         return res
           .status(400)
           .json({
-            message: `Invalid request, There is no recipe with id: ${value.id}`,
+            msg: `Invalid request, There is no recipe with id: ${value.id}`,
           })
       }
 
@@ -238,10 +237,10 @@ class UserController {
         })
 
       return res
-        .status(200)
+        .status(201)
         .json({
-          message: `Recipe successfully updated`,
-          recipe: rec.id
+          msg: `Recipe successfully updated`,
+          recipe: rec
         });
     } catch (error) {
       
@@ -314,9 +313,6 @@ class UserController {
         ingredients: Joi
           .array()
           .items(Joi.string()),
-        guide: Joi
-          .array()
-          .items(Joi.string()),
         type: Joi
           .string(),
         page: Joi
@@ -336,7 +332,7 @@ class UserController {
       if (!value) {
         return res
           .status(400)
-          .json({ message: 'Bad request, no data provided'});
+          .json({ msg: 'Bad request, no data provided'});
       }
 
       const user_promise = User
@@ -354,9 +350,7 @@ class UserController {
         filter.ingredients = { $in: value['ingredients']};
       }
       if(value.type) { filter.type = value.type; }
-      if(value.guide) {
-        filter.guide = { $in: value.guide};
-      }
+      
 
       const gather_data_task = Promise.all([
         recipe_repo.get_recs(value), //get recipes
@@ -410,9 +404,6 @@ class UserController {
         name: Joi
           .string(),
         ingredients: Joi
-          .array()
-          .items(Joi.string()),
-        guide: Joi
           .array()
           .items(Joi.string()),
         type: Joi
@@ -483,9 +474,6 @@ class UserController {
         filter.ingredients = { $in: value['ingredients']};
       }
       if(value.type) { filter.type = value.type; }
-      if(value.guide) {
-        filter.guide = { $in: value.guide};
-      }
       
       const user = await user_promise;
       filter.user = user;

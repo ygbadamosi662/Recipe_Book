@@ -27,17 +27,9 @@ function App() {
           <Navbar />
           <QueryClientProvider client={queryClient}>
             <Routes>
-              <Route
-                exact
-                path="/"
-                element={<ComeWithUs initChoice={false} />}
-              />
+              <Route exact path="/" element={<ComeWithUs initChoice={false} />}/>
               <Route exact path="/user/dash" element={<Dashboard />} />
-              <Route
-                exact
-                path="/user/create/recipe"
-                element={<CreateRecipe />}
-              />
+              <Route exact path="/user/create/recipe" element={<CreateRecipe />}/>
               <Route exact path="/user/profile" element={<UserProfile />} />
             </Routes>
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

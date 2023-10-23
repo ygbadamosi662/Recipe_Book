@@ -3,11 +3,11 @@ import { Field, ErrorMessage } from "formik";
 import TextError from "./TextError";
 
 function CheckboxField(props) {
-  const { label, name, options, ...rest } = props;
+  const { label, name, options, className, ...rest } = props;
   return (
     <div className="form-control">
       <label>{label}</label>
-      <Field name={name} {...rest}>
+      <Field name={name} {...rest} className={className}>
         {({ field }) => {
           return options.map((option) => {
             return(

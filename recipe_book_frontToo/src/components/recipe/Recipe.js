@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
 import { getRecipe } from "../../api_calls";
 import { toast } from "react-toastify";
+import { FaHeart } from 'react-icons/fa';
 import "./Recipe.css";
 
 function Recipe({ id, reduxLogRecipe}) {
@@ -74,13 +75,14 @@ function Recipe({ id, reduxLogRecipe}) {
             </div>
             <div className="info">
                 <label>Likes</label>
-                <span>{recipe?.fave_count}</span>
+                <span><FaHeart/>{recipe?.fave_count}</span>
             </div>
             <div className="info">
                 <button type="button">Reveiws</button>
             </div>
         </div>
         <div className="recipe-ingredients">
+            <h3>Ingredients</h3>
             { recipe?.ingredients ?
               recipe.ingredients.map((ing, index) => {
                 return <h4 key={index} className="recipe-ingredient">
@@ -91,14 +93,8 @@ function Recipe({ id, reduxLogRecipe}) {
             }
         </div>
         <div className="recipe-guides">
-            { recipe?.guide ?
-              recipe.guide.map((guide, index) => {
-                return <p key={index} className="recipe-guide">
-                          {guide}
-                       </p>
-              })
-              : <h2>No guide available for this recipe....</h2>
-            }
+            <h3>Preparation</h3>
+            { recipe?.guide ? recipe : "Nothing to show"}
         </div>
     </div>
   );

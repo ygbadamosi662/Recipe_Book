@@ -73,7 +73,6 @@ function CreateRecipe({ reduxLogRecipe }) {
       description: description,
       permit: permit,
       ingredients: ingredients.split(","),
-      guide: guide,
     };
 
     try {
@@ -146,6 +145,8 @@ function CreateRecipe({ reduxLogRecipe }) {
             name="guide"
             className="input"
           />
+
+          <FormikControl control="text-area" label="Preparation" name="guide" />
 
           <FormikControl
             control="select"
