@@ -8,15 +8,14 @@ import { register } from "../../api_calls";
 import { toast } from "react-toastify";
 import "./Signup.css";
 
-
 function Signup(props) {
-  const {reduxLogUser, goL, reduxUser} = props;
-  
+  const { reduxLogUser, goL, reduxUser } = props;
+
   // Formik initial values
   let initVal = {};
-  
+
   // if redux user exists
-  if(reduxUser) {
+  if (reduxUser) {
     initVal = reduxUser;
   } else {
     initVal = {
@@ -30,47 +29,41 @@ function Signup(props) {
   }
 
   const validationSchema = Yup.object({
-    fname: Yup
-      .string()
-      .required("Required"),
-    lname: Yup
-      .string()
-      .required("Required"),
-    email: Yup
-      .string()
-      .email('Email not valid!')
-      .required("Required"),
-    password: Yup
-      .string()
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/, "Password must have atleast one lowercase letter, one uppercase letter, one digit, one special chararcters and a minimum lenght of 8 chararcters")
+    fname: Yup.string().required("Required"),
+    lname: Yup.string().required("Required"),
+    email: Yup.string().email("Email not valid!").required("Required"),
+    password: Yup.string()
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/,
+        "Password must have atleast one lowercase letter, one uppercase letter, one digit, one special chararcters and a minimum lenght of 8 chararcters"
+      )
       .required("Required"),
     cpass: Yup.string()
-      .oneOf([Yup.ref('password')], 'password must match')
-      .required('Required'),
-    phone: Yup
-      .string()
+      .oneOf([Yup.ref("password")], "password must match")
+      .required("Required"),
+    phone: Yup.string()
       .matches(/^[8792][01]\d{8}$/, "not a valid number")
-      .required('Required'),
+      .required("Required"),
   });
 
   // handles form submission
   const onSubmit = async (values) => {
-    const {fname, lname, email, password, phone} = values
+    const { fname, lname, email, password, phone } = values;
     const user = {
-      'fname': fname,
-      'lname': lname,
-      'email': email,
-      'password': password,
-      'phone': phone
-    }
-    
+      fname: fname,
+      lname: lname,
+      email: email,
+      password: password,
+      phone: phone,
+    };
+
     try {
       const res = await register(JSON.stringify(user));
       reduxLogUser(res.data.user);
       goL();
     } catch (error) {
-      if(error.response) {
-        if(error.response.status === 400) {
+      if (error.response) {
+        if (error.response.status === 400) {
           toast.error(`${error.response.data.msg}: Sign in instead?`, {
             position: toast.POSITION.TOP_RIGHT,
           });
@@ -82,7 +75,7 @@ function Signup(props) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
-  }
+  };
 
   return (
     <Formik
@@ -97,6 +90,7 @@ function Signup(props) {
             type="text"
             label="Firstname"
             name="fname"
+            className="input"
           />
 
           <FormikControl
@@ -104,6 +98,7 @@ function Signup(props) {
             type="text"
             label="Lastname"
             name="lname"
+            className="input"
           />
 
           <FormikControl
@@ -111,6 +106,7 @@ function Signup(props) {
             type="email"
             label="Email"
             name="email"
+            className="input"
           />
 
           <FormikControl
@@ -118,6 +114,7 @@ function Signup(props) {
             type="text"
             label="Phone Number"
             name="phone"
+            className="input"
           />
 
           <FormikControl
@@ -125,6 +122,7 @@ function Signup(props) {
             type="password"
             label="Password"
             name="password"
+            className="input"
           />
 
           <FormikControl
@@ -132,6 +130,7 @@ function Signup(props) {
             type="password"
             label="Confirm Password"
             name="cpass"
+            className="input"
           />
 
           <button
@@ -141,25 +140,24 @@ function Signup(props) {
           >
             Register
           </button>
-          
         </Form>
       )}
     </Formik>
   );
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     // gets user email if set
-    reduxUser: state.user.user
-  }
-}
+    reduxUser: state.user.user,
+  };
+};
 // sets user email to redux
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    reduxLogUser: (user) => dispatch(logUser(user))
-  }
-}
+    reduxLogUser: (user) => dispatch(logUser(user)),
+  };
+};
 
 // hook up our component with our redux store
 export default connect(mapStateToProps, mapDispatchToProps)(Signup);

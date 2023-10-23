@@ -1,25 +1,24 @@
 * {
-	padding: 0;
-	margin: 0;
-	box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .signup-form {
-	display: grid;
-    border-radius: 0.5rem;
-    color: white;
+  display: grid;
+  border-radius: 0.5rem;
+  color: white;
 }
 
 .main-container {
-    height: 60%;
-    width: 40%;
-    margin: 5rem 0rem 10rem  35rem;
-    padding: 3rem;
-    background-color: rgb(68,70,84);
+  width: 40%;
+  margin: 5rem 0rem 10rem 23rem;
+  padding: 3rem;
+  background-color: rgb(68, 70, 84);
 }
 
 .toggle {
-    display: flex;
-    margin-bottom: 2rem;
-    /* background-color: white; */
+  display: flex;
+  margin-bottom: 2rem;
+  /* background-color: white; */
 }
