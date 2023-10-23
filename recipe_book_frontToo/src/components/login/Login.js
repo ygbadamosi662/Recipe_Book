@@ -11,7 +11,7 @@ import { login } from "../../api_calls";
 import "./Login.css";
 
 function Login(props) {
-  const {reduxLogUser} = props;
+  const { reduxLogUser } = props;
 
   const navigate = useNavigate();
 
@@ -21,12 +21,12 @@ function Login(props) {
   };
 
   const validationSchema = Yup.object({
-    email_or_phone: Yup
-      .string()
-      .required(),
-    password: Yup
-      .string()
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/, "password not valid")
+    email_or_phone: Yup.string().required(),
+    password: Yup.string()
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/,
+        "password not valid"
+      )
       .required("Required"),
   });
 
@@ -36,7 +36,7 @@ function Login(props) {
       email_or_phone: email_or_phone,
       password: password,
     };
-    
+
     try {
       const res = await login(JSON.stringify(user));
       setToken(res.data.token);
@@ -44,10 +44,10 @@ function Login(props) {
       toast.success(res.data.msg, {
         position: toast.POSITION.TOP_RIGHT,
       });
-      navigate('/user/dash');
+      navigate("/user/dash");
     } catch (error) {
-      if(error.response) {
-        console.log(error.response.data.msg)
+      if (error.response) {
+        console.log(error.response.data.msg);
         toast.error(error.response.data.msg, {
           position: toast.POSITION.TOP_RIGHT,
         });
@@ -70,7 +70,7 @@ function Login(props) {
         <Form className="login-form">
           <FormikControl
             control="input"
-            className=""
+            className="input"
             type="text"
             label="Email/Phone"
             name="email_or_phone"
@@ -80,6 +80,7 @@ function Login(props) {
             control="input"
             type="password"
             label="Password"
+            className="input"
             name="password"
           />
 
@@ -96,16 +97,16 @@ function Login(props) {
   );
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    reduxUser: state.user.user
-  }
-}
+    reduxUser: state.user.user,
+  };
+};
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    reduxLogUser: (user) => dispatch(logUser(user))
-  }
-}
+    reduxLogUser: (user) => dispatch(logUser(user)),
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
