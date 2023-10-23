@@ -42,14 +42,14 @@ function Signup(props) {
       .required("Required"),
     password: Yup
       .string()
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/)
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/, "Password must have atleast one lowercase letter, one uppercase letter, one digit, one special chararcters and a minimum lenght of 8 chararcters")
       .required("Required"),
-      cpass: Yup.string()
+    cpass: Yup.string()
       .oneOf([Yup.ref('password')], 'password must match')
       .required('Required'),
     phone: Yup
       .string()
-      .matches(/^[8792][01]\d{8}$/)
+      .matches(/^[8792][01]\d{8}$/, "not a valid number")
       .required('Required'),
   });
 
@@ -65,7 +65,7 @@ function Signup(props) {
     }
     
     try {
-      const res = await register(user);
+      const res = await register(JSON.stringify(user));
       reduxLogUser(res.data.user);
       goL();
     } catch (error) {
@@ -137,6 +137,7 @@ function Signup(props) {
           <button
             type="submit"
             disabled={formik.isSubmitting}
+            className="submit-btn"
           >
             Register
           </button>

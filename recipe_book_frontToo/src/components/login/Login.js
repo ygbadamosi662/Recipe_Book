@@ -3,7 +3,6 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FormikControl from "../../FormikControl";
 import { setToken } from "../../appAuth";
-import { setAuthHeader } from "../../appAxios";
 import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { logUser } from "../../Redux/User/userActions";
@@ -27,7 +26,7 @@ function Login(props) {
       .required(),
     password: Yup
       .string()
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/)
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/, "password not valid")
       .required("Required"),
   });
 
@@ -39,10 +38,12 @@ function Login(props) {
     };
     
     try {
-      const res = await login(user);
+      const res = await login(JSON.stringify(user));
       setToken(res.data.token);
-      setAuthHeader()
       reduxLogUser(res.data.user);
+      toast.success(res.data.msg, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
       navigate('/user/dash');
     } catch (error) {
       if(error.response) {
@@ -69,6 +70,7 @@ function Login(props) {
         <Form className="login-form">
           <FormikControl
             control="input"
+            className=""
             type="text"
             label="Email/Phone"
             name="email_or_phone"
@@ -84,6 +86,7 @@ function Login(props) {
           <button
             type="submit"
             disabled={!formik.isValid || formik.isSubmitting}
+            className="submit-btn"
           >
             Login
           </button>

@@ -22,7 +22,7 @@ class UserController {
       if(!req.params.id) {
         return res
           .status(400)
-          .json({ error: 'Bad request, id is required'});
+          .json({ msg: 'Bad request, id is required'});
       }
 
       const query = User.findById(req.params.id);
@@ -44,9 +44,9 @@ class UserController {
       if(!user) {
         return res
           .status(400)
-          .json({ message: 'User does not exist'})
+          .json({ msg: 'User does not exist'})
       }
-
+      user.password = "";
       return res
         .status(200)
         .json({ user: user});
@@ -107,7 +107,7 @@ class UserController {
         return res
           .status(400)
           .json({
-            message: `Invalid request, you already created a ${value.name} Recipe, update it if you want`,
+            msg: `Invalid request, you already created a ${value.name} Recipe, update it if you want`,
           })
       }
 
@@ -129,23 +129,23 @@ class UserController {
       recipe.user = recipe.user.id;
 
       return res
-        .status(200)
+        .status(201)
         .json({
-          message: `Recipe ${recipe.name} successfully created`,
+          msg: `Recipe ${recipe.name} successfully created`,
           recipe: recipe,
         });
     } catch (error) {
       
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
-        return res.status(500).json({error: error.message});
+        return res.status(500).json({msg: error.message});
       }
       if (error instanceof JsonWebTokenErro) {
         console.log('We have a jwt problem', error.message);
-        return res.status(500).json({error: error.message});
+        return res.status(500).json({msg: error.message});
       }
       console.log(error);
-      return res.status(500).json({error: error.message});
+      return res.status(500).json({msg: error.message});
     }
   }
 
@@ -614,12 +614,12 @@ class UserController {
       if(value.aka) { user.name.aka = value.aka; }
 
       await user.save();
-
+      user.password = "";
       return res
-        .status(200)
+        .status(201)
         .json({ 
-          Message: 'User succesfully updated',
-          user: user.id,
+          msg: 'User succesfully updated',
+          user: user,
         });
 
     } catch (error) {

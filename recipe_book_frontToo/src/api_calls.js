@@ -1,4 +1,4 @@
-import { appAx } from "./appAxios"
+import { appAx, setAuthHeader } from "./appAxios"
 /**
  * All functions in this module return a promise
  * @author Yusuf Gbadamosi <https://github.com/ygbadamosi662>
@@ -51,6 +51,7 @@ export const signout = () => {
 *   token: jwt_token
 * }
 */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/logout`);
 };
 // auth routes: user specific routes
@@ -62,6 +63,7 @@ export const getUser = (id) => {
 *   user: <user_obj>
 * }
 */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/get/${id}`);
 };
 
@@ -91,6 +93,7 @@ export const updateUser = (payload) => {
  *  user: <string: user id>
  * }
 */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/update', payload);
 };
 
@@ -111,7 +114,7 @@ export const createRecipe = (payload) => {
 *   recipe: <recipe_obj>,
 * }
 */
-
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/recipe/create', payload);
 };
 
@@ -133,6 +136,7 @@ export const updateRecipe = (payload) => {
 *   recipe: <string: recipes id>
 * }
 */
+  setAuthHeader();
   return appAx.post("http://127.0.0.1:1245/api/v1/auth/users/recipe/update", payload);
 };
 
@@ -175,6 +179,7 @@ export const getMyRecipes = (payload) => {
 *   total_pages: <integer>
 * }
 */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/recipe/get/recipes/mine', payload);
 }
 
@@ -186,6 +191,7 @@ export const getRecipe = (id) => {
  *   recipe: <recipe_obj>
  * }
  */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/recipe/get/${id}`);
 };
 
@@ -197,6 +203,7 @@ export const faveRecipe = (id) => {
  *   message: 'user faved <recipe.name> recipe',
  * }
  */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/recipe/fave/${id}`);
 };
 
@@ -213,6 +220,7 @@ export const reviewRecipe = (payload) => {
 *   review: <review_obj>
 * }
 */
+  setAuthHeader();
   return appAx.post("http://127.0.0.1:1245/api/v1/auth/users/recipe/review", payload);
 };
 
@@ -236,6 +244,7 @@ export const getRecipeReviews = (payload) => {
 *   total_pages: <integer>
 * }
 */
+  setAuthHeader();
   return appAx.post("http://127.0.0.1:1245/api/v1/auth/users/recipe/get/reviews", payload);
 };
 
@@ -247,7 +256,7 @@ export const getReview = (id) => {
 *   review: <[review_obj>,
 * }
 */
- 
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/review/${id}`);
 };
 
@@ -259,7 +268,7 @@ export const deleteReview = (id) => {
 *   message: "Review with id: <review.id> successfully deleted"
 * }
 */
-
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/review/delete/${id}`);
 };
 
@@ -271,6 +280,7 @@ export const deleteRecipe = (id) => {
 *   message: "Recipe with id: <recipe.id> successfully deleted"
 * }
 */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/recipe/delete/${id}`);
 };
 
@@ -290,6 +300,7 @@ export const getMyNotifications = (payload) => {
   *   total_pages: <integer>
   * }
   */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/notification/notifications', payload);
 };
 
@@ -301,6 +312,7 @@ export const getNotification = (id) => {
   *   note: <notification_obj>
   * }
   */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/users/notification/${id}`);
 };
 
@@ -315,6 +327,7 @@ export const follow_unfollow = (payload) => {
   *   message: "You are now following <user.name.fname + user.name.lname>"
   * }
   */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/FollowUnfollow', payload);
 };
 
@@ -329,6 +342,7 @@ export const getFollowersOrFollowing = async (payload) => {
   *   users: <[user_obj]>
   * }
   */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/FollowUnfollow', payload);
 };
 // auth routes: admin specific routes
@@ -345,6 +359,7 @@ export const SUPER_ADMIN_manage_user_role = (payload) => {
   *   user: <user_obj>
   * }
   */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/admin/role/switcheroo', payload);
 };
 
@@ -359,6 +374,7 @@ export const ADMIN_findUser = (payload) => {
   *   user: <user_obj>
   * }
   */
+  setAuthHeader();
   return appAx.post('http://127.0.0.1:1245/api/v1/auth/admin/find/user', payload);
 };
 
@@ -385,6 +401,7 @@ export const ADMIN_getUsers = (payload) => {
   *   total_pages: <integer>
   * }
   */
+    setAuthHeader();
     return appAx.post("http://127.0.0.1:1245/api/v1/auth/admin/get/users", payload);
 };
 
@@ -412,7 +429,7 @@ export const ADMIN_getRecipes = (payload) => {
 *   total_pages: <integer>
 * }
 */
-
+  setAuthHeader();
   return appAx.post("http://127.0.0.1:1245/api/v1/auth/admin/get/recipes", payload);
 };
 
@@ -441,6 +458,7 @@ export const ADMIN_getReviews = (payload) => {
 *   total_pages: <integer>
 * }
 */
+  setAuthHeader();
   return appAx.post("http://127.0.0.1:1245/api/v1/auth/admin/get/reviews", payload);
 };
 
@@ -464,6 +482,7 @@ export const ADMIN_getNotifications = (payload) => {
 *   total_pages: <integer>
 * }
 */
+  setAuthHeader();
   return appAx.post("http://127.0.0.1:1245/api/v1/auth/admin/get/notifications", payload);
 };
 
@@ -475,6 +494,7 @@ export const ADMIN_getRecipe = (id) => {
 *   recipe: <recipe_obj>
 * }
 */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/admin/get/recipe/${id}`);
 };
 
@@ -486,6 +506,7 @@ export const ADMIN_getReview = (id) => {
 *   review: <review_obj>
 * }
 */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/admin/get/review/${id}`);
 };
 
@@ -497,7 +518,7 @@ export const ADMIN_getNotification = (id) => {
 *   notification: <notification_obj>
 * }
 */
-
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/admin/get/notification/${id}`);
 };
 
@@ -509,7 +530,7 @@ export const ADMIN_deleteReview = (id) => {
 *   message: "Review with id: <review.id> successfully deleted"
 * }
 */
-
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/admin/review/delete/${id}`);
 };
 
@@ -521,5 +542,6 @@ export const ADMIN_deleteRecipe = (id) => {
 *   message: "Recipe with id: <recipe.id> successfully deleted"
 * }
 */
+  setAuthHeader();
   return appAx.get(`http://127.0.0.1:1245/api/v1/auth/admin/recipe/delete/${id}`);
 };

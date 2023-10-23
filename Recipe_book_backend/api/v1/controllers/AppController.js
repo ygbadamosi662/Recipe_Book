@@ -121,7 +121,7 @@ class AppController {
       }
       let user = {}
       
-      user = await user_repo.findByEmail(value.email_or_phone, ['name', 'password', 'role', 'id', 'email']);
+      user = await user_repo.findByEmail(value.email_or_phone, ['name', 'password', 'role', 'id', 'email', 'phone']);
       if(!user) {
         user = await user_repo.findByPhone(value.email_or_phone, ['name', 'password', 'role', 'id', 'email']);
       }
@@ -149,11 +149,13 @@ class AppController {
       return response
         .status(200)
         .json({
-          message: 'Login succesful',
+          msg: 'Login succesful',
           user: {
-            id: user._id,
+            _id: user._id,
             role: user.role,
             name: user.name,
+            email: user.email,
+            phone: user.phone
           },
           token: token,
         });

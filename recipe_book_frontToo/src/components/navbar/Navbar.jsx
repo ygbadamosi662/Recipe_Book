@@ -13,6 +13,7 @@ function Navbar() {
 //   const navRef = useRef();
   //checks user authentication
   const auth = localStorage.getItem("Jwt") ? true : false;
+  
   const navigate = useNavigate();
 
   const [noteCount, setNoteCount] = useState(0);
@@ -23,7 +24,6 @@ function Navbar() {
         count: true,
         status: "not read",
       };
-
       getMyNotifications(JSON.stringify(filter))
         .then((response) => {
           if (response.status === 200) {

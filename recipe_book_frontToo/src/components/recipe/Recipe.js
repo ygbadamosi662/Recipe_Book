@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useMutation } from "react-query";
 import { connect } from "react-redux";
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
@@ -18,15 +17,16 @@ function Recipe({ id, reduxLogRecipe}) {
   } = useMutation(getRecipe);
 
   useEffect(() => {
-    fetchRecipe(id);
+    if(!id) {
+      toast.error("id is required", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    if(id) {
+      fetchRecipe(id);
+    }
   },[id, fetchRecipe]);
 
-  if(!id) {
-    toast.error("id is required", {
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  }
-  
   if(isLoading)
   {
     return <h2>Loading...</h2>

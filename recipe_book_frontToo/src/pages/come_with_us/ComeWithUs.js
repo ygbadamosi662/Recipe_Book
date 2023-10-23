@@ -4,8 +4,6 @@ import Login from "../../components/login/Login";
 import Holder from "./Holder";
 import "./ComeWithUs.css";
 
-
-
 const stylez = (clas) => {
   return {
       borderBottom: clas === 'active' ? "0.5rem solid green" : "",
