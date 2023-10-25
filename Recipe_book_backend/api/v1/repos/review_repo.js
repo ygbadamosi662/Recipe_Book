@@ -28,7 +28,7 @@ class ReviewRepo {
 
     const revs =  await this._repo
       .find(filter)
-      .populate('user')
+      .populate('user', 'name _id')
       .skip((page - 1) * size)
       .limit(size)
       .sort({ stars: 1 })

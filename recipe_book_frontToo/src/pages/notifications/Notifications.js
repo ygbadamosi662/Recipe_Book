@@ -84,7 +84,7 @@ function Notifications({ payload, command }) {
               prev
             </button>
           )}
-          <span>{`${totalPages}/${page}`}</span>
+          <span>{`${page}/${totalPages}`}</span>
           {page < totalPages && (
             <button type="button" className="next-btm" onClick={handleNextClick}>
                 next

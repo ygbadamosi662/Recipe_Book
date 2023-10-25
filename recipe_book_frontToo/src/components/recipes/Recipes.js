@@ -33,7 +33,6 @@ function Recipes({ payload, command, reduxLogRecipe }) {
         if (res.status === 200) {
           if(res.data.recipes) {
             setRecipes(res.data.recipes);
-            console.log(res.data.recipes)
           }
           if(res.data?.total_pages) {
             setTotalPages(res.data?.total_pages);
@@ -43,7 +42,6 @@ function Recipes({ payload, command, reduxLogRecipe }) {
           }
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -98,7 +96,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
               prev
             </button>
           )}
-          <span>{`${totalPages}/${page}`}</span>
+          <span>{`${page}/${totalPages}`}</span>
           {page < totalPages && (
             <button type="button" className="next-btm" onClick={handleNextClick}>
                 next
