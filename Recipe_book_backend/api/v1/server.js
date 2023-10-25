@@ -29,6 +29,7 @@ const God = (async () => {
         aka: 'Food Book',
       }
     });
+    console.log(`${process.env.APP_EMAIL}: We are open for business`);
   } catch (error) {
     console.log('Error creating or checking for God user', error);
   }

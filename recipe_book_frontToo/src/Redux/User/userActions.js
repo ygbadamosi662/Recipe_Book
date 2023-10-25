@@ -1,4 +1,4 @@
-import { LOG_USERS, LOG_USER, LOG_EMAIL, LOG_PHONE, LOG_NOT_AUTH } from "./userTypes";
+import { LOG_USERS, LOG_USER, LOG_EMAIL, LOG_PHONE, LOG_NOT_AUTH, LOG_STARS } from "./userTypes";
 
 export const logUser = (payLoad={}) => {
   return {
@@ -28,9 +28,16 @@ export const logPhone = (payLoad='') => {
   };
 }
 
-export const logNot_Auth = () => {
+export const logStars = (payLoad=0) => {
+  return {
+    type: LOG_STARS,
+    stars: payLoad,
+  };
+}
+
+export const logNot_Auth = (payload=true) => {
   return {
     type: LOG_NOT_AUTH,
-    not_auth: false,
+    not_auth: payload,
   };
 }

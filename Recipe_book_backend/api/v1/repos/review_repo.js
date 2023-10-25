@@ -24,37 +24,28 @@ class ReviewRepo {
     return this._page_size;
   }
 
-  async get_revs (obj) {
-    if (!obj) { return }
-    // defaults
-    let PAGE_SIZE = this._page_size;
-    let page = 1;
-
-    // if page and size is set
-    if ((obj['page'] && obj['page'] !== 1) || obj['size']) {
-      if (obj['size']) { PAGE_SIZE = obj['size'] }
-      if (obj['page']) { page = obj['page'] }
-    }
-    // remove the page and size property
-    delete obj.page;
-    delete obj.size;
+  async get_revs (filter, page=1, size=5) {
 
     const revs =  await this._repo
-      .find(obj)
-      .skip((page - 1) * PAGE_SIZE)
-      .limit(PAGE_SIZE)
+      .find(filter)
+      .populate('user')
+      .skip((page - 1) * size)
+      .limit(size)
       .sort({ stars: 1 })
       .exec();
     return revs;
   }
 
-  async has_next_page(filter, page=1, page_size=this._page_size) {
+  async has_next_page(filter, page, page_size) {
     try {
       const totalCount = await this._repo
         .countDocuments(filter)
         .exec();
 
-      const totalPages = Math.floor(totalCount / page_size);
+      let totalPages = Math.floor(totalCount / page_size);
+      if((totalCount % page_size) > 0) {
+        totalPages = totalPages + 1;
+      }
       const hasNextPage = page < totalPages;
 
       return hasNextPage;
@@ -69,7 +60,13 @@ class ReviewRepo {
         .countDocuments(filter)
         .exec();
 
-      return Math.floor(totalCount / page_size);;
+      let totalPages = Math.floor(totalCount / page_size);
+      
+      if((totalCount % page_size) > 0) {
+        totalPages = totalPages + 1;
+      }
+
+      return totalPages;
     } catch (error) {
       throw error;
     }

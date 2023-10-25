@@ -21,6 +21,7 @@ const stylez = (clas) => {
 
 function ComeWithUs({ initChoice }) {
   const handleChoice = (event) => {
+    event.preventDefault();
     const what = event.currentTarget.name;
 
     switch (what) {

@@ -1,10 +1,10 @@
 import React from "react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
-// import { useNavigate } from "react-router-dom";
 import { connect } from "react-redux";
 import { logReviews } from "../../Redux/Review/reviewActions";
 import { getRecipeReviews, ADMIN_getReviews } from "../../api_calls";
+import { FaStar } from 'react-icons/fa';
 import { toast } from "react-toastify";
 import "./Reviews.css";
 
@@ -51,9 +51,20 @@ function Reviews({ payload, pack, reduxLogReviews }) {
 
   const reviews = data?.data.reviews;
 
-//   const onClick = () => {
-//     navigate('/reviews', { id: id});
-//   }
+  const showStars = (stars) => {
+    if (stars > 0) {
+      let star_show = [];
+      for (let index = 1; index <= stars; index++) {
+        star_show.push(<FaStar key={index} className="selected"/>);
+      }
+      return (
+        <div>
+          {star_show}
+        </div>
+      );
+    }
+    return null; // Return null if there are no stars to display
+  };
 
   return (
     <div className="reviews">
@@ -61,13 +72,13 @@ function Reviews({ payload, pack, reduxLogReviews }) {
         reviews.map((review, index) => {
           return <div key={index} className="review">
                     <div className="review-writer">
-                        Place holder
+                        {review.user.name.fname}
                     </div>
                     <h3 className="review-comment">
                         {review.comment}
                     </h3>
                     <div className="review-stars">
-                        {review.stars}
+                        {showStars(review.stars)}
                     </div>
                  </div>
         })
@@ -79,7 +90,6 @@ function Reviews({ payload, pack, reduxLogReviews }) {
 
 const mapStateToProps = state => {
   return {
-    // gets user email if set
     reduxUser: state.user.user
   }
 }

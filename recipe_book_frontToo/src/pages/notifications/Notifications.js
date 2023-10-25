@@ -1,39 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { logRecipe } from "../../Redux/Recipe/recipeActions";
-import { getMyRecipes, getRecipes, ADMIN_getRecipes } from "../../api_calls";
-import { useNavigate } from "react-router-dom";
-import { FaHeart } from 'react-icons/fa';
+import { logNotifications } from "../../Redux/Notification/notificationActions";
+import { getMyNotifications, ADMIN_getNotifications } from "../../api_calls";
 import { toast } from "react-toastify";
-import "./Recipes.css";
+import "./Notifications.css";
 
-function Recipes({ payload, command, reduxLogRecipe }) {
-  const navigate = useNavigate();
+function Notifications({ payload, command, reduxLogNotifications, reduxNotes }) {
+
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
-  const [recipes, setRecipes] = useState([]);
   const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
     const orders = {
-        user_recipes: getRecipes,
-        user_myRecipes: getMyRecipes,
-        Admin_recipes: ADMIN_getRecipes,
-    };
-
+      user_notes: getMyNotifications,
+      admin: ADMIN_getNotifications,
+    }
     if(!orders[command]) {
       toast.error("Invalid command", {
           position: toast.POSITION.TOP_RIGHT,
         });
     }
-    const fetchRecipes = async () => {
+    const fetchNotes = async () => {
       try {
         payload.page = page;
         const res = await orders[command](JSON.stringify(payload));
         if (res.status === 200) {
-          if(res.data.recipes) {
-            setRecipes(res.data.recipes);
-          }
+          reduxLogNotifications(res.data?.notes);
           if(res.data?.total_pages) {
             setTotalPages(res.data?.total_pages);
           }
@@ -41,6 +35,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
             setHaveNextPage(true);
           }
         }
+      
       } catch (error) {
         console.log(error)
         if (error.response) {
@@ -54,17 +49,9 @@ function Recipes({ payload, command, reduxLogRecipe }) {
         }
       }
     };
-    fetchRecipes();
-  }, [payload, command, page, setRecipes]);
-
-
-  const handleRecipeClick = (e, id) => {
-    e.preventDefault();
-    reduxLogRecipe({
-      _id: id
-    });
-    navigate('/user/recipe');
-  };
+    fetchNotes();
+  }, [command, page, haveNextPage, totalPages, payload, reduxLogNotifications]);
+  
 
   const handleNextClick = () => {
     setPage(page + 1);
@@ -74,22 +61,26 @@ function Recipes({ payload, command, reduxLogRecipe }) {
     setPage(page - 1);
   };
 
+
   return (
-    <div className="recipes">
-      {recipes ? (
-        recipes.map((recipe, index) => (
-          <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)}>
-            <h3 className="recipe-name">{`Name: ${recipe.name}`}</h3>
-            <div className="recipe-type">{`Type: ${recipe.type}`}</div>
-            <div className="recipe-permit">{`Permit: ${recipe.permit}`}</div>
-            <div className="recipe-likes">
-              <FaHeart /> {recipe.fave_count}
-            </div>
-          </div>
-        ))
-      ) : (
-        <h2>No Recipe found....</h2>
-      )}
+    <div className="notess">
+      <h3>Notifications</h3>
+      { reduxNotes ?
+        reduxNotes?.map((note, index) => {
+          return <div key={index} className="note">
+                    <div className="note-sub">
+                        {note.subject}
+                    </div>
+                    <h3 className="note-comment">
+                        {note.comment}
+                    </h3>
+                    <div className="note-status">
+                        {note.status}
+                    </div>
+                 </div>
+        })
+        : <h2>No Notification found....</h2>
+      }
       {haveNextPage && (
         <div className="page-btns-container">
           {page > 1 && (
@@ -110,16 +101,18 @@ function Recipes({ payload, command, reduxLogRecipe }) {
   );
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
+    // gets user email if set
     reduxUser: state.user.user,
-  };
-};
+    reduxNotes: state.notification.notifications,
+  }
+}
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    reduxLogRecipe: (recipe) => dispatch(logRecipe(recipe)),
-  };
-};
+    reduxLogNotifications: (notes) => dispatch(logNotifications(notes))
+  }
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(Recipes);
+export default connect(mapStateToProps, mapDispatchToProps)(Notifications);

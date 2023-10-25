@@ -157,7 +157,8 @@ export const getRecipes = (payload) => {
 *   total_pages: <integer>
 * }
 */
-  return appAx.get('http://127.0.0.1:1245/api/v1/auth/users/recipe/get/recipes', payload);
+  setAuthHeader();
+  return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/recipe/get/recipes', payload);
 };
 
 export const getMyRecipes = (payload) => {

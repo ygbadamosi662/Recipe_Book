@@ -1,9 +1,10 @@
-import { LOG_USERS, LOG_USER, LOG_EMAIL, LOG_PHONE, LOG_NOT_AUTH } from "./userTypes";
+import { LOG_USERS, LOG_USER, LOG_EMAIL, LOG_PHONE, LOG_NOT_AUTH, LOG_STARS } from "./userTypes";
 
 const initState = {
-    user: {},
-    users: [],
-    not_auth: true
+  user: {},
+  users: [],
+  not_auth: true,
+  stars: 0
 }
 
 export const userReducer = (state = initState, action) => {
@@ -30,7 +31,11 @@ export const userReducer = (state = initState, action) => {
     }  
     case LOG_NOT_AUTH: return {
         ...state,
-        not_auth: false
+        not_auth: action.not_auth
+    }  
+    case LOG_STARS: return {
+        ...state,
+        stars: action.stars
     }  
     default: return state
   }

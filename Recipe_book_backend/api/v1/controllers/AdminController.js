@@ -485,7 +485,7 @@ class AdminController {
               return res
                 .status(400)
                 .json({
-                  message: `Bad Request, ${who.length == 2 ? who.join(',') : who[0]} does not exist`,
+                  msg: `Bad Request, ${who.length == 2 ? who.join(',') : who[0]} does not exist`,
                 });
             }
 
@@ -499,7 +499,7 @@ class AdminController {
               return res
                 .status(400)
                 .json({
-                  message: 'Bad request, User does not exist',
+                  msg: 'Bad request, User does not exist',
                 });
             }
             filter.user = user;
@@ -511,7 +511,7 @@ class AdminController {
               return res
                 .status(400)
                 .json({
-                  message: 'Bad request, Recipe does not exist',
+                  msg: 'Bad request, Recipe does not exist',
                 });
             }
             filter.recipe = rec;
@@ -562,6 +562,7 @@ class AdminController {
           .find(filter)
           .skip((value.page - 1) * value.size)
           .limit(value.size)
+          .populate('user')
           .sort({ createdAt: -1 })
           .exec(), //get recipes
         review_repo.has_next_page(filter, value.page, value.size), //if there is a next page
@@ -706,11 +707,14 @@ class AdminController {
         .status(400)
         .json({ msg: 'Invalid request, id is required'}); 
       }
-      const recipe = await Recipe.findById(req.params.id);
+      const recipe = await Recipe
+        .findById(req.params.id)
+        .populate('user')
+        .exec();
 
       if (!recipe) {
         return res
-          .status(401)
+          .status(400)
           .json({
             msg: 'Bad request, recipe does not exist',
           });
