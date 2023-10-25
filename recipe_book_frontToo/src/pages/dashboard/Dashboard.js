@@ -1,40 +1,107 @@
 import { React, useState } from "react";
 import "./Dashboard.css";
 import { connect } from "react-redux";
-// import Recipes from "../../components/recipes/Recipes";
-import Recipe from "../../components/recipe/Recipe";
-// import Reviews from "../../components/reviews/Reviews";
-// import Notifications from "../../components/notifications/Notifications";
+import { toast } from "react-toastify";
+import { Formik, Form } from "formik";
+import Recipes from "../../components/recipes/Recipes";
+import * as Yup from "yup";
+import FormikControl from "../../FormikControl";
 
 
 const Dashboard = ({ reduxUser }) => {
-  // JUST TO TEST MY COMPONENTS FOR NOW
-  // const filter = {
-  //   count: false,
-  //   status: "RECEIVED",
-  //   page: 1,
-  //   size: 20,
-  // };
 
-  const [flag, setFlag] = useState(false);
-  // const submit = { ...filter.filter, page: 1, size: 10 };
-
-  const handleClick = () => {
-    console.log('hey');
-    setFlag(true);
+  const init_payload = {
+    page: 1,
+    size: 5
   };
+
+  const [payload, setPayload] = useState(init_payload);
+
+  const form_init_value = {
+    name: "",
+    ingredients: "",
+    type: "",
+  };
+
+  const validationSchema = Yup.object({
+    name: Yup
+      .string(),
+    type: Yup
+      .string(),
+    
+    ingredients: Yup
+      .string()
+      .test({
+        name: 'ingridient-validation',
+        message: 'too few ingredients',
+        test: (value) => {
+            if(value) {
+              return value.split(",").length > 1;
+            }
+            return false;
+          },
+      }),
+  });
+
+  const handleFilterSubmit = (values) => {
+    if(!values) {
+      toast.warning("Filter is empty", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+
+      return;
+    }
+    if(values?.type) {
+      values.type = values.type?.toUpperCase();
+    }
+    
+    setPayload(values);
+  }
 
   return (
     <div className="relative container home-container">
-      Welcome here {reduxUser.id}
-      <button type="button" >GET RECIPES</button>
-      <button type="button" >GET REVIEWS</button>
-      <button type="button" onClick={handleClick}>GET RECIPE</button>
-      <button type="button" >GET NOTES</button>
+      <div className="Filter">
+        <h3>Search By: </h3>
+        <Formik
+        onSubmit={handleFilterSubmit}
+        initialValues={form_init_value}
+        validationSchema={validationSchema}
+        >
+          {(formik) => (
+            <Form className="recipe-form">
+              <FormikControl
+                control="input"
+                type="text"
+                label="Recipe Name"
+                name="name"
+              />
 
-      {flag && (
-        <Recipe id="65341119db330d940b9697b0" />
-      )}
+              <FormikControl
+                control="input"
+                type="text"
+                label="Type"
+                name="type"
+              />
+
+              <FormikControl
+                control="input"
+                type="text"
+                label="Ingredients, seperated by a ',' comma"
+                name="ingredients"
+              />
+
+              <button
+                type="submit"
+                disabled={!formik.isValid || formik.isSubmitting}
+                className="submit-btn"
+              >
+                Search
+              </button>
+            </Form>
+          )}
+        </Formik>
+        <Recipes payload={payload} command="user_recipes"/>
+      </div>
     </div>
   );
 };

@@ -40,7 +40,11 @@ function Navbar({ reduxUserNotAuth }) {
           }
       });
     }
-  }, [auth]);
+    if(reduxUserNotAuth) {
+      // navigate bk to come_with_us page
+      navigate('/');
+    }
+  }, [auth, reduxUserNotAuth, navigate]);
 
   const take_home_page = async (e) => {
     e.preventDefault(); // Prevent the default form submission
@@ -50,6 +54,11 @@ function Navbar({ reduxUserNotAuth }) {
   const to_create_recipe_page = async (e) => {
     e.preventDefault(); // Prevent the default form submission
     navigate('/user/create/recipe');
+  }
+
+  const handleNotesClick = (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    navigate('/user/notes');
   }
 
   return (
@@ -66,8 +75,10 @@ function Navbar({ reduxUserNotAuth }) {
                 CREATE RECIPE
               </button>
               <div className="note-div">
-                <FaBell className="notification-badge"></FaBell>
-                <span>{noteCount}</span>
+                <button type="button" className="notification-btn" onClick={handleNotesClick}>
+                  <FaBell className="notification-badge"></FaBell>
+                  <span>{noteCount}</span>
+                </button>
               </div>
               <HamburgerMenu />
             </div>

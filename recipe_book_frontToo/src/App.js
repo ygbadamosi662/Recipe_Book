@@ -5,6 +5,10 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Navbar from "./components/navbar/Navbar";
 import UserProfile from "./pages/user_profile/UserProfile";
 import CreateRecipe from "./pages/create_recipe/CreateRecipe";
+import UpdateRecipe from "./pages/update_recipe/UpdateRecipe";
+import Notifications from "./pages/notifications/Notifications";
+import User from "./pages/user/User";
+import Recipe from "./pages/recipe/Recipe";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { Provider } from "react-redux";
@@ -31,6 +35,10 @@ function App() {
               <Route exact path="/user/dash" element={<Dashboard />} />
               <Route exact path="/user/create/recipe" element={<CreateRecipe />}/>
               <Route exact path="/user/profile" element={<UserProfile />} />
+              <Route exact path="/user/recipe/update" element={<UpdateRecipe />} />
+              <Route exact path="/user/recipe" element={<Recipe />} />
+              <Route exact path="/user/user/:id" element={<User />} />
+              <Route exact path="/user/notes" element={<Notifications payload={{page: 1, size: 5}} command="user_notes"/>} />
             </Routes>
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
           </QueryClientProvider>

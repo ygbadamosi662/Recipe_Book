@@ -29,24 +29,51 @@ class UserController {
 
       // if not user or admin
       if((req.user.id !== req.params.id) || (![Role.admin, Role.super_admin].includes(req.user.role))) {
-        query.select(
-          [
-            'name',
-            'id',
-            'followers',
-            'following',
-            'recipes',
-            'faves'
-          ].join(' ')
-          );
+        query
+          .select(
+            [
+              'name',
+              '_id',
+              'followers',
+              'following',
+              'recipes',
+              'faves'
+            ].join(' ')
+            );
       }
-      const user = await query.exec();
+      const user = await query
+        .populate(['recipes', 'faves'])
+        .exec();
       if(!user) {
         return res
           .status(400)
           .json({ msg: 'User does not exist'})
       }
       user.password = "";
+      // filters recipes
+      user.recipes?.filter((recipe) => {
+        // if not user or admin
+       if((req.user.id !== req.params.id) || (![Role.admin, Role.super_admin].includes(req.user.role))) {
+          let fills = user.followers?.map((fill) => {
+            return fill._id.toString();
+          });
+          if((recipe.permit === Permit.private) && !fills.includes(req.user.id)) {
+            return false;
+          }
+          return true;
+        }
+      });
+
+      // filter faves
+      user.faves?.filter((recipe) => {
+        // if not user or admin
+        if((req.user.id !== req.params.id) || (![Role.admin, Role.super_admin].includes(req.user.role))) {
+          if((recipe.permit === Permit.private) && (req.user.id !== recipe.user.toString())) {
+            return false;
+          }
+          return true;
+        }
+      });
       return res
         .status(200)
         .json({ user: user});
@@ -264,11 +291,14 @@ class UserController {
         .status(400)
         .json({ msg: 'Invalid request, id is required'}); 
       }
-      const recipe = await Recipe.findById(req.params.id).exec();
+      const recipe = await Recipe
+      .findById(req.params.id)
+      .populate('user')
+      .exec();
 
       if (!recipe) {
         return res
-          .status(401)
+          .status(400)
           .json({
             msg: 'Invalid Request, recipe does not exist',
           });
@@ -278,7 +308,7 @@ class UserController {
         const user = await user_repo.findByEmail(req.user.email, ['id']);
         if (user.id !== recipe.user) {
           return res
-            .status(401)
+            .status(400)
             .json({
               msg: 'Invalid Request, Recipe is private',
             });
@@ -317,22 +347,18 @@ class UserController {
           .string(),
         page: Joi
           .number()
-          .integer(),
+          .integer()
+          .default(1),
         size: Joi
           .number()
-          .integer(),
+          .integer()
+          .default(5),
       });
 
       // validate body
       const { value, error } = schema.validate(req.body);
       if (error) {
         throw error;
-      }
-
-      if (!value) {
-        return res
-          .status(400)
-          .json({ msg: 'Bad request, no data provided'});
       }
 
       const user_promise = User
@@ -351,43 +377,53 @@ class UserController {
       }
       if(value.type) { filter.type = value.type; }
       
-
+      
       const gather_data_task = Promise.all([
-        recipe_repo.get_recs(value), //get recipes
+        recipe_repo.get_recs(filter, value.page, value.size), //get recipes
         recipe_repo.has_next_page(filter, value.page, value.size), //if there is a next page
         recipe_repo.total_pages(filter, value.size), //get total pages
       ]);
-
       // const recs = await recipe_repo.get_recs(value);
       const user = await user_promise;
-      const done = await gather_data_task;
+      const donezo = await gather_data_task;
+    
       return res
         .status(200)
         .json({
-          recipes: done[0]
+          recipes: donezo[0]
             .filter( async (recipe) => {
               // user not a follower
               if ((recipe.permit === Permit.private)) {
                 const recipe_owner = await User.findById(recipe.user);
-                if(recipe_owner.followers.includes(user.id)) {
+                if(recipe_owner.followers.includes(user._id)) {
                   return true
                 }
                 // filters out pivate recipes if user !== recipe.user 
                 return user === recipe.user;
               }
               return true;
+            })
+            .map((recipe) => {
+              return {
+                _id: recipe._id,
+                name: recipe.name,
+                type: recipe.type,
+                permit: recipe.permit,
+                fave_count: recipe.fave_count,
+              };
             }),
-          have_next_page: done[1],
-          total_pages: done[2]
+          have_next_page: donezo[1],
+          total_pages: donezo[2]
         });
     } catch (error) {
-      
+      console.log(error, "err");
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
         return res.status(500).json({error: error.message});
       }
       if (error instanceof JsonWebTokenErro) {
         console.log('We have a jwt problem', error.message);
+        console.log(error)
         return res.status(500).json({error: error.message});
       }
       console.log(error);
@@ -415,10 +451,12 @@ class UserController {
           .valid(...Object.values(Permit)),
         page: Joi
           .number()
-          .integer(),
+          .integer()
+          .default(1),
         size: Joi
           .number()
           .integer()
+          .default(5)
       });
 
       // validate body
@@ -488,7 +526,18 @@ class UserController {
       return res
         .status(200)
         .json({
-          recipes: done[0],
+          recipes: done[0]?.map((recipe) => {
+            return {
+                _id: recipe._id,
+                name: recipe.name,
+                type: recipe.type,
+                permit: recipe.permit,
+                fave_count: recipe.fave_count,
+                user: {
+                  _id: recipe._id
+                }
+              };
+          }),
           have_next_page: done[1],
           total_pages: done[2],
         });
@@ -631,7 +680,7 @@ class UserController {
         return res
           .status(400)
           .json({
-            message: 'Invalid Request recipe id is required',
+            msg: 'Invalid Request recipe id is required',
           })
       }
 
@@ -643,11 +692,11 @@ class UserController {
       const user = await user_pr;
 
       // checks if user has faved the recipe b$
-      if(user.faves.includes(rec.id)) {
+      if(user.faves.includes(rec._id)) {
         return res
           .status(200)
           .json({
-            message: `Recipe with ${rec.id} is already a fave for the user`
+            msg: `Recipe with ${rec.id} is already liked by the user`
           });
       }
       rec.fave_count = rec.fave_count + 1;
@@ -667,9 +716,9 @@ class UserController {
           });
       });
       return res
-        .status(200)
+        .status(201)
         .json({
-          message: `user faved ${rec.name} recipe`,
+          msg: `user liked ${rec.name} recipe`,
         });
       
     } catch (error) {
@@ -715,9 +764,9 @@ class UserController {
                     .exec();
       if(!rec) {
         return res
-          .status(201)
+          .status(400)
           .json({
-            message: 'Invalid Request, recipe does not exist',
+            msg: 'Invalid Request, recipe does not exist',
           });
       }
 
@@ -743,13 +792,10 @@ class UserController {
             });
         })
 
-      rev.user = value['user'].id;
-      rev.recipe = value['recipe'].id;
-
       return res
         .status(201)
         .json({
-          message: 'Review created successfully',
+          msg: 'Review created successfully',
           review: rev
         });
     } catch (error) {
@@ -792,7 +838,7 @@ class UserController {
         size: Joi
           .number()
           .integer()
-          .default(20),
+          .default(5),
       });
 
       // validate body
@@ -846,7 +892,7 @@ class UserController {
       }
 
       const gather_data_task = Promise.all([
-        review_repo.get_revs({ ...filter, page: value.page, size: value.size}), //get reviewa
+        review_repo.get_revs(filter, value.page, value.size), //get reviewa
         review_repo.has_next_page(filter, value.page, value.size), //if there is a next page
         review_repo.total_pages(filter, value.size), //get total pages
       ]);
@@ -857,7 +903,6 @@ class UserController {
         .status(200)
         .json({
           reviews: done[0].map((rev) => {
-            rev.user = rev.user.id;
             rev.recipe = rev.recipe.id;
             return rev;
           }),
@@ -889,21 +934,21 @@ class UserController {
           });
       }
       const rev = await Review
-        .findById(req.params.id);
+        .findById(req.params.id)
+        .populate('user');
       if(!rev) {
         return res
-          .status(401)
+          .status(40)
           .json({
             error: 'Invalid Request, review does not exist',
           });
       }
 
-      rev.user = rev.user.id;
       rev.recipe = rev.recipe.id;
       return res
         .status(200)
         .json({
-          review: await rev,
+          review: rev,
         });
     } catch (error) {
       
@@ -930,8 +975,7 @@ class UserController {
           .string(),
         status: Joi
           .string()
-          .valid(...Object.values(Status))
-          .default(Status.sent),
+          .valid(...Object.values(Status)),
         page: Joi
           .number()
           .integer()
@@ -939,7 +983,7 @@ class UserController {
         size: Joi
           .number()
           .integer()
-          .default(20),
+          .default(5),
       });
 
       // validate body
@@ -948,7 +992,7 @@ class UserController {
       if (error) {
         throw error;
       }
-
+      
       const user_pr = user_repo.findByEmail(req.user.email, ['id']);
 
       // fill up filter
@@ -962,6 +1006,7 @@ class UserController {
         }
       }
       const user = await user_pr;
+
       if(!user) {
         return res
           .status(500)
@@ -982,45 +1027,52 @@ class UserController {
             count: count,
           });
       }
-
+  
       const gather_data_task = Promise.all([
-        await Notification
-        .find(filter)
-        .skip((value.page - 1) * value.size)
-        .limit(value.size)
-        .sort({ createdAt: -1 })
-        .exec(), //get notifications
+        Notification
+          .find(filter)
+          .skip((value.page - 1) * value.size)
+          .limit(value.size)
+          .sort({ createdAt: -1 })
+          .exec(), //get notifications
         notification_repo.has_next_page(filter, value.page, value.size), //if there is a next page
         notification_repo.total_pages(filter, value.size), //get total pages
       ]);
-
       const donezo = await gather_data_task;
+
       let result = [];
       if (donezo[0]) {
         // update notification status
         await Connection
           .transaction(async () => {
             let gather_task = [];
-            donezo[0].map((note) => {
+            donezo[0]?.map((note) => {
               if(note.status === Status.sent) {
                 note.status = Status.received;
                 gather_task.push(note.save());
               }
             });
+            donezo[0].filter((note) => {
+              return note.status === Status.sent
+            });
 
             result = await Promise.all(gather_task);
+            if(result) {
+              result = [...donezo[0], ...result];
+            }
+            if(!result) {
+              result = donezo[0];
+            }
           });
       }
-
       return res
         .status(200)
         .json({
-          notes: result ? result.map((note) => {
+          notes: result ? result?.map((note) => {
             return {
               id: note.id,
               comment: note.comment,
               status: note.status,
-              subject: note.subject
             };
           }) : [],
           have_next_page: donezo[1],
@@ -1030,6 +1082,7 @@ class UserController {
       
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
+        console.log(error)
         return res.status(500).json({error: error.message});
       }
       if (error instanceof JsonWebTokenErro) {
@@ -1152,31 +1205,39 @@ class UserController {
         throw error;
       }
 
+      if(value.id === req.user.id) {
+        return res
+          .status(400)
+          .json({ msg: 'You cannot follow or unfollow yoursef'});
+      }
+
       const following = await User
         .findById(value.id);
 
       if (!following) {
         return res
           .status(400)
-          .json({ error: 'Invalid request, user does not exist'});
+          .json({ msg: 'Invalid request, user does not exist'});
       }
 
       const follower = await user_repo.findByEmail(req.user.email);
+      
 
       // if user wants to follow
-      if(value.follow) {
+      if(value.follow === true) {
         // this checks if user is following already
-        if(following.followers.includes(follower.id)) {
+        if(following.followers.includes(follower._id)) {
           return res
             .status(200)
-            .json({ message: `You are already following ${following.name.fname + ' ' + following.name.lname}` })
+            .json({ msg: `You are already following ${following.name.fname + ' ' + following.name.lname}` })
         }
 
         following.followers.push(follower);
         follower.following.push(following);
+        let result = {}
         await Connection
           .transaction(async () => {
-              const result = await Promise.all([following.save(), follower.save()]);
+              result = await Promise.all([following.save(), follower.save()]);
               // notifies 
               await notification_service.notify({
                 to: following,
@@ -1186,16 +1247,27 @@ class UserController {
           });
 
         return res
-          .status(200)
+          .status(201)
           .json({ 
-            message: `You are now following ${result[0].name.fname + ' ' + result[0].name.lname}`
+            msg: `You are now following ${result[0].name.fname + ' ' + result[0].name.lname}`
           });
       }
 
+      // this checks if user is following
+      if(!(following.followers.includes(follower._id))) {
+        return res
+          .status(200)
+          .json({ msg: `You are not following ${following.name.fname + ' ' + following.name.lname}` })
+      }[].filter
+
+      following.followers = following.followers.filter((fool) => {
+        return fool !== follower;
+      });
+      await following.save();
       return res
-        .status(200)
+        .status(201)
         .json({ 
-          message: `You unfollwed ${following.name.fname + ' ' + following.name.lname}`
+          msg: `You unfollwed ${following.name.fname + ' ' + following.name.lname}`
         });
     } catch (error) {
       if (error instanceof MongooseError) {
@@ -1217,6 +1289,9 @@ class UserController {
         count: Joi
           .boolean()
           .default(false),
+        id: Joi
+          .string()
+          .required(),
         which: Joi
           .string()
           .valid(...Object.values(Which))
@@ -1230,11 +1305,13 @@ class UserController {
         throw error;
       }
 
-      const user_pr = user_repo.findByEmail(req.user.email);
+      const user_pr = User.findById(value.id)
+        .select('followers following _id');
+      
 
        // if count is true, consumer just wants a count of the filtered document
       if (value.count) {
-        const user = await user_pr;
+        const user = await user_pr.exec();
         const give_count = () => {
           if(value.which === Which.followers) {
             return { count: user.followers ? user.followers.length : 0 }
@@ -1249,7 +1326,9 @@ class UserController {
       }
 
       let users = []
-      const user = await user_pr;
+      const user = await user_pr
+        .populate(['followers', 'following'], 'name _id')
+        .exec();
       if (value.which === Which.followers) {
         users = user.followers;
       }

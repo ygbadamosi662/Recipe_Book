@@ -44,7 +44,7 @@ function Login(props) {
       toast.success(res.data.msg, {
         position: toast.POSITION.TOP_RIGHT,
       });
-      reduxLogNotAuth();
+      reduxLogNotAuth(false);
       navigate("/user/dash");
     } catch (error) {
       if (error.response) {
@@ -107,7 +107,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     reduxLogUser: (user) => dispatch(logUser(user)),
-    reduxLogNotAuth: () => dispatch(logNot_Auth()),
+    reduxLogNotAuth: (payload) => dispatch(logNot_Auth(payload)),
   };
 };
 

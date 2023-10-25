@@ -31,7 +31,6 @@ class NotificationService {
           status: Status.sent,
         };
       }));
-      console.log(all);
       return all;
     } catch (error) {
       throw error;

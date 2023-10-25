@@ -29,13 +29,16 @@ class NotificationRepo {
     return this._page_size;
   }
 
-  async has_next_page(filter, page=1, page_size=this._page_size) {
+  async has_next_page(filter, page, page_size) {
     try {
       const totalCount = await this._repo
         .countDocuments(filter)
         .exec();
 
-      const totalPages = Math.floor(totalCount / page_size);
+      let totalPages = Math.floor(totalCount / page_size);
+      if((totalCount % page_size) > 0) {
+        totalPages = totalPages + 1;
+      }
       const hasNextPage = page < totalPages;
 
       return hasNextPage;
@@ -50,7 +53,13 @@ class NotificationRepo {
         .countDocuments(filter)
         .exec();
 
-      return Math.floor(totalCount / page_size);;
+      let totalPages = Math.floor(totalCount / page_size);
+      
+      if((totalCount % page_size) > 0) {
+        totalPages = totalPages + 1;
+      }
+
+      return totalPages;
     } catch (error) {
       throw error;
     }

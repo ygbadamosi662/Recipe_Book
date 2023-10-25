@@ -143,7 +143,7 @@ class AppController {
       const token = await jwt_service.generate_token({
         email: user.email,
         role: user.role,
-        id: user.id,
+        _id: user.id,
       });
 
       return response

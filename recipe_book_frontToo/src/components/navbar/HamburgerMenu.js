@@ -3,9 +3,11 @@ import './HamburgerMenu.css';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { signout } from "../../api_calls";
+import { connect } from "react-redux";
+import { logNot_Auth } from '../../Redux/User/userActions';
 import { toast } from "react-toastify";
 
-function HamburgerMenu() {
+function HamburgerMenu({ reduxLogNotAuth }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -21,19 +23,19 @@ function HamburgerMenu() {
   const handleLogOut = async (e) => {
     e.preventDefault(); // Prevent the default form submission
     try {
-      const sign_out_pr = signout();
-      localStorage.removeItem("Jwt");
-      const res = await sign_out_pr; 
-      if(res.data.status === 200) {
-        toast.success(`${res.data.msg} and ${res.data.token} blacklisted`, {
+      const res = await signout(); 
+      if(res.status === 200) {
+        toast.success(res.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
         });
+        localStorage.removeItem("Jwt");
+        reduxLogNotAuth(true);
+        navigate('/');
       }
 
-      navigate('/');
-
     } catch (error) {
-      if(error.response.status === 500) {
+      
+      if(error.response?.status === 500) {
         toast.success("Server Error", {
             position: toast.POSITION.TOP_RIGHT,
         });
@@ -70,4 +72,10 @@ function HamburgerMenu() {
   );
 }
 
-export default HamburgerMenu;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    reduxLogNotAuth: (payload) => dispatch(logNot_Auth(payload)),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(HamburgerMenu);
