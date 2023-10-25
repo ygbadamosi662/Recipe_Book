@@ -1,16 +1,16 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { logNotifications } from "../../Redux/Notification/notificationActions";
 import { getMyNotifications, ADMIN_getNotifications } from "../../api_calls";
 import { toast } from "react-toastify";
 import "./Notifications.css";
 
-function Notifications({ payload, command, reduxLogNotifications, reduxNotes }) {
+function Notifications({ payload, command }) {
 
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
-  const [totalPages, setTotalPages] = useState(0)
+  const [totalPages, setTotalPages] = useState(0);
+  const [notes, setNotes] = useState([]);
 
   useEffect(() => {
     const orders = {
@@ -27,7 +27,7 @@ function Notifications({ payload, command, reduxLogNotifications, reduxNotes }) 
         payload.page = page;
         const res = await orders[command](JSON.stringify(payload));
         if (res.status === 200) {
-          reduxLogNotifications(res.data?.notes);
+          setNotes(res.data?.notes)
           if(res.data?.total_pages) {
             setTotalPages(res.data?.total_pages);
           }
@@ -50,7 +50,7 @@ function Notifications({ payload, command, reduxLogNotifications, reduxNotes }) 
       }
     };
     fetchNotes();
-  }, [command, page, haveNextPage, totalPages, payload, reduxLogNotifications]);
+  }, [command, page, haveNextPage, totalPages, payload]);
   
 
   const handleNextClick = () => {
@@ -65,12 +65,9 @@ function Notifications({ payload, command, reduxLogNotifications, reduxNotes }) 
   return (
     <div className="notess">
       <h3>Notifications</h3>
-      { reduxNotes ?
-        reduxNotes?.map((note, index) => {
+      { notes ?
+        notes?.map((note, index) => {
           return <div key={index} className="note">
-                    <div className="note-sub">
-                        {note.subject}
-                    </div>
                     <h3 className="note-comment">
                         {note.comment}
                     </h3>
@@ -103,16 +100,8 @@ function Notifications({ payload, command, reduxLogNotifications, reduxNotes }) 
 
 const mapStateToProps = state => {
   return {
-    // gets user email if set
     reduxUser: state.user.user,
-    reduxNotes: state.notification.notifications,
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    reduxLogNotifications: (notes) => dispatch(logNotifications(notes))
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Notifications);
+export default connect(mapStateToProps, null)(Notifications);

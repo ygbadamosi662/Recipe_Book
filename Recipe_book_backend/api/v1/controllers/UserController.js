@@ -975,8 +975,7 @@ class UserController {
           .string(),
         status: Joi
           .string()
-          .valid(...Object.values(Status))
-          .default(Status.sent),
+          .valid(...Object.values(Status)),
         page: Joi
           .number()
           .integer()
@@ -993,7 +992,7 @@ class UserController {
       if (error) {
         throw error;
       }
-
+      
       const user_pr = user_repo.findByEmail(req.user.email, ['id']);
 
       // fill up filter
@@ -1007,6 +1006,7 @@ class UserController {
         }
       }
       const user = await user_pr;
+
       if(!user) {
         return res
           .status(500)
@@ -1027,58 +1027,52 @@ class UserController {
             count: count,
           });
       }
-
+  
       const gather_data_task = Promise.all([
-        await Notification
-        .find(filter)
-        .populate('subject')
-        .skip((value.page - 1) * value.size)
-        .limit(value.size)
-        .sort({ createdAt: -1 })
-        .exec(), //get notifications
+        Notification
+          .find(filter)
+          .skip((value.page - 1) * value.size)
+          .limit(value.size)
+          .sort({ createdAt: -1 })
+          .exec(), //get notifications
         notification_repo.has_next_page(filter, value.page, value.size), //if there is a next page
         notification_repo.total_pages(filter, value.size), //get total pages
       ]);
-
       const donezo = await gather_data_task;
+
       let result = [];
       if (donezo[0]) {
         // update notification status
         await Connection
           .transaction(async () => {
             let gather_task = [];
-            donezo[0].map((note) => {
+            donezo[0]?.map((note) => {
               if(note.status === Status.sent) {
                 note.status = Status.received;
                 gather_task.push(note.save());
               }
             });
+            donezo[0].filter((note) => {
+              return note.status === Status.sent
+            });
 
             result = await Promise.all(gather_task);
+            if(result) {
+              result = [...donezo[0], ...result];
+            }
+            if(!result) {
+              result = donezo[0];
+            }
           });
       }
-      console.log("in notes")
       return res
         .status(200)
         .json({
-          notes: result ? result.map((note) => {
-            note.subject.name.fname ? note.subject.name.fname+" "+note.subject.name.lname 
-                      : note.subject.name
-            if(note.subject.name) {
-              if(note.subject.name.fname) {
-                note.subject = note.subject.name.fname+" "+lname;
-              } else {
-                note.subject = note.subject.name;
-              }
-            }
-            if(note.subject.comment) {
-              note.subject = note.subject.comment;
-            }
+          notes: result ? result?.map((note) => {
             return {
               id: note.id,
               comment: note.comment,
               status: note.status,
-              subject: note.subject
             };
           }) : [],
           have_next_page: donezo[1],
@@ -1088,6 +1082,7 @@ class UserController {
       
       if (error instanceof MongooseError) {
         console.log('We have a mongoose problem', error.message);
+        console.log(error)
         return res.status(500).json({error: error.message});
       }
       if (error instanceof JsonWebTokenErro) {
