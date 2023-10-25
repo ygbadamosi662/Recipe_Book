@@ -61,9 +61,8 @@ function Notifications({ payload, command }) {
     setPage(page - 1);
   };
 
-
   return (
-    <div className="notess">
+    <div className="notes">
       <h3>Notifications</h3>
       { notes ?
         notes?.map((note, index) => {

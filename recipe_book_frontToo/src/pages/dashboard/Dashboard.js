@@ -28,34 +28,46 @@ const Dashboard = ({ reduxUser }) => {
       .string(),
     type: Yup
       .string(),
-    
     ingredients: Yup
       .string()
-      .test({
-        name: 'ingridient-validation',
-        message: 'too few ingredients',
-        test: (value) => {
-            if(value) {
-              return value.split(",").length > 1;
-            }
-            return false;
-          },
-      }),
+      // .test({
+      //   name: 'ingridient-validation',
+      //   message: '',
+      //   test: (value) => {
+      //       if(value) {
+      //         return value.split(",").length < 1;
+      //       }
+      //       return false;
+      //     },
+      // }),
   });
 
   const handleFilterSubmit = (values) => {
-    if(!values) {
+    if((values.name === "" ) && (values.ingredients === "") && (values.type === "")) {
       toast.warning("Filter is empty", {
         position: toast.POSITION.TOP_RIGHT,
       });
-
       return;
     }
-    if(values?.type) {
-      values.type = values.type?.toUpperCase();
+
+    // build query
+    let query = {};
+    if(values?.type !== "") {
+      query.type = values.type?.toUpperCase();
     }
-    
-    setPayload(values);
+
+    if(values.ingredients !== "") {
+      query.ingredients = values.ingredients.split(",");
+    }
+
+    if(values.name !== "") {
+      query.name = values.name
+    }
+
+    query.page = 1;
+    query.size = 5
+    console.log(query)
+    setPayload(query);
   }
 
   return (
@@ -92,7 +104,7 @@ const Dashboard = ({ reduxUser }) => {
 
               <button
                 type="submit"
-                disabled={!formik.isValid || formik.isSubmitting}
+                disabled={formik.isSubmitting}
                 className="submit-btn"
               >
                 Search

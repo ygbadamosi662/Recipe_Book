@@ -33,6 +33,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
         if (res.status === 200) {
           if(res.data.recipes) {
             setRecipes(res.data.recipes);
+            console.log(res.data.recipes)
           }
           if(res.data?.total_pages) {
             setTotalPages(res.data?.total_pages);

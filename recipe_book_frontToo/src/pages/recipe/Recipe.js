@@ -153,7 +153,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
         <div className="recipe-owner">
           {`${recipe.user.name.fname}  ${recipe.user.name.lname}`}
           <button type="button" className="owner-btn" onClick={(e) => handleViewOwner(e, recipe.user._id)}>
-            View
+            View User
           </button>
         </div>
         

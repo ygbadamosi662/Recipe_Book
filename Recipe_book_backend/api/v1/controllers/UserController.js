@@ -371,7 +371,7 @@ class UserController {
       }
       let filter = {};
       // fill up filter
-      if(value.name) { filter.name = new RegExp(`${value['name']}`); }
+      if(value.name) { filter.name = value.name }
       if(value.ingredients) { 
         filter.ingredients = { $in: value['ingredients']};
       }
@@ -491,9 +491,6 @@ class UserController {
         delete filters.page;
         delete filters.size;
 
-        if (filters.name) {
-          filters.name = new RegExp(filters.name);
-        }
         filters.user = await user_promise;
         const count = await Recipe.countDocuments(filters);
 
@@ -507,7 +504,7 @@ class UserController {
 
       let filter = {};
       // fill up filter
-      if(value.name) { filter.name = new RegExp(`${value['name']}`); }
+      if(value.name) { filter.name = filter.name }
       if(value.ingredients) { 
         filter.ingredients = { $in: value['ingredients']};
       }
