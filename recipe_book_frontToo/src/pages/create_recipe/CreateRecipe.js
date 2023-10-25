@@ -143,10 +143,8 @@ function CreateRecipe({ reduxLogRecipe }) {
             control="text-area"
             label="Preparation"
             name="guide"
-            className="input"
+            className="input-pre"
           />
-
-          <FormikControl control="text-area" label="Preparation" name="guide" />
 
           <FormikControl
             control="select"
