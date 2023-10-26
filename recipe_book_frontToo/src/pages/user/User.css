@@ -1,0 +1,70 @@
+.user {
+  padding: 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.user-meta {
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+followers-following-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+follow-unfollow-btn {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.toggle {
+  display: flex;
+  justify-content: space-between;
+}
+
+.recipe {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.recipe-name {
+  font-weight: bold;
+}
+
+.recipe-likes {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.user-bk-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+}
