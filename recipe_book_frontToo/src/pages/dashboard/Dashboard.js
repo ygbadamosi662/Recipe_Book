@@ -122,7 +122,6 @@ const Dashboard = ({ reduxUser }) => {
 
   return (
     <div className="relative container home-container">
-<<<<<<< HEAD
       { !showFullHouse && (
           <button type="button" className="followers-following-btn" onClick={(e) => handleFollowers_following_btn(e)}>
             <span>{`Followers(${ffCount.followers})`}</span>/
@@ -181,74 +180,6 @@ const Dashboard = ({ reduxUser }) => {
           </div>
         )
       }
-=======
-      {!showFullHouse && (
-        <button
-          type="button"
-          className="followers-following-btn"
-          onClick={(e) => handleFollowers_following_btn(e)}
-        >
-          <span>{`Followers(${ffCount.followers})`}</span>/
-          <span>{`Following(${ffCount.following})`}</span>
-        </button>
-      )}
-      {!showFullHouse && (
-        <div className="Filter">
-          <h3>Search By: </h3>
-          <Formik
-            onSubmit={handleFilterSubmit}
-            initialValues={form_init_value}
-            validationSchema={validationSchema}
-          >
-            {(formik) => (
-              <Form className="recipe-form">
-                <FormikControl
-                  control="input"
-                  type="text"
-                  label="Recipe Name"
-                  name="name"
-                />
-
-                <FormikControl
-                  control="input"
-                  type="text"
-                  label="Type"
-                  name="type"
-                />
-
-                <FormikControl
-                  control="input"
-                  type="text"
-                  label="Ingredients, seperated by a ',' comma"
-                  name="ingredients"
-                />
-
-                <button
-                  type="submit"
-                  disabled={formik.isSubmitting}
-                  className="submit-btn"
-                >
-                  Search
-                </button>
-              </Form>
-            )}
-          </Formik>
-          <Recipes payload={payload} command="user_recipes" />
-        </div>
-      )}
-      {showFullHouse && (
-        <div className="fullhouse">
-          <button
-            type="button"
-            className="dash-bk-btn"
-            onClick={(e) => handleBackToDashClick(e)}
-          >
-            Go back to Dash
-          </button>
-          <FullHouse id={reduxUser._id} />
-        </div>
-      )}
->>>>>>> e9761dfdfb03a15efe66a5b285ad85a6fcb469e7
     </div>
   );
 };
