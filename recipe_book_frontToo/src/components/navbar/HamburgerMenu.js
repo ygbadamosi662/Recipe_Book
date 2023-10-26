@@ -34,7 +34,13 @@ function HamburgerMenu({ reduxLogNotAuth }) {
       }
 
     } catch (error) {
-      
+      if(error.response?.status === 401) {
+        toast.warning("Login again", {
+            position: toast.POSITION.TOP_RIGHT,
+        });
+        navigate('/');
+      }
+
       if(error.response?.status === 500) {
         toast.success("Server Error", {
             position: toast.POSITION.TOP_RIGHT,

@@ -7,10 +7,11 @@ import UserProfile from "./pages/user_profile/UserProfile";
 import CreateRecipe from "./pages/create_recipe/CreateRecipe";
 import UpdateRecipe from "./pages/update_recipe/UpdateRecipe";
 import Notifications from "./pages/notifications/Notifications";
+import Footer from "./components/footer/Footer";
 import User from "./pages/user/User";
 import Recipe from "./pages/recipe/Recipe";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
+// import { ReactQueryDevtools } from "react-query/devtools";
 import { Provider } from "react-redux";
 import { store } from "./Redux/store";
 import { ToastContainer } from "react-toastify";
@@ -40,8 +41,9 @@ function App() {
               <Route exact path="/user/user/:id" element={<User />} />
               <Route exact path="/user/notes" element={<Notifications payload={{page: 1, size: 5}} command="user_notes"/>} />
             </Routes>
-            <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+            {/* <ReactQueryDevtools initialIsOpen={false} position="bottom-right" /> */}
           </QueryClientProvider>
+          <Footer />
         </React.Fragment>
         <ToastContainer />
       </div>

@@ -74,21 +74,23 @@ function Recipes({ payload, command, reduxLogRecipe }) {
   };
 
   return (
-    <div className="recipes">
-      {recipes ? (
-        recipes.map((recipe, index) => (
-          <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)}>
-            <h3 className="recipe-name">{`Name: ${recipe.name}`}</h3>
-            <div className="recipe-type">{`Type: ${recipe.type}`}</div>
-            <div className="recipe-permit">{`Permit: ${recipe.permit}`}</div>
-            <div className="recipe-likes">
-              <FaHeart /> {recipe.fave_count}
+    <div className="mains">
+      <div className="recipes">
+        {recipes ? (
+          recipes.map((recipe, index) => (
+            <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)}>
+              <h3 className="recipe-name">{`Name: ${recipe.name}`}</h3>
+              <div className="recipe-type">{`Type: ${recipe.type}`}</div>
+              <div className="recipe-permit">{`Permit: ${recipe.permit}`}</div>
+              <div className="recipe-likes">
+                <FaHeart /> {recipe.fave_count}
+              </div>
             </div>
-          </div>
-        ))
-      ) : (
-        <h2>No Recipe found....</h2>
-      )}
+          ))
+        ) : (
+          <h2>No Recipe found....</h2>
+        )}
+      </div>
       {haveNextPage && (
         <div className="page-btns-container">
           {page > 1 && (

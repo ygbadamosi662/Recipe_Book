@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer>
       <div className="containner">
-        <p>&copy; {new Date().getFullYear()} Your Recipe App</p>
+        <p>&copy; {new Date().getFullYear()} Recipe App</p>
         <ul className="footer-links">
           <li>
             <a href="/terms">Terms of Service</a>

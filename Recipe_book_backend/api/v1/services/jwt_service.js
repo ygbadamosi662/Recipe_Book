@@ -34,7 +34,7 @@ const authenticate_token = async (req, res, next) => {
       return res
         .status(401)
         .json({
-          message: 'Invalid Request',
+          msg: 'Invalid Request',
         });
     }
 
@@ -42,14 +42,14 @@ const authenticate_token = async (req, res, next) => {
     const jwt_token = await db_storage.get_jwt(token);
     if (jwt_token) {
       return res
-      .status(400)
-      .json({ message: 'Invalid Request, User should log in again' });
+      .status(401)
+      .json({ msg: 'Invalid Request, User should log in again' });
     }
 
     // if token is valid
     jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
       if (err) {
-        return res.status(401).json({ Jwt_Error: 'Token expired, login again'}); // Forbidden
+        return res.status(401).json({ msg: 'Token expired, login again'}); // Forbidden
       }
       req.user = user;
       next();

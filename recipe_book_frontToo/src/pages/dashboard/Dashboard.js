@@ -138,15 +138,14 @@ const Dashboard = ({ reduxUser }) => {
         )
       }
       { !showFullHouse && (
-          <div className="Filter">
-            <h3>Search By: </h3>
-            <Formik
+          <div className="filter">
+            <Formik 
             onSubmit={handleFilterSubmit}
             initialValues={form_init_value}
             validationSchema={validationSchema}
             >
               {(formik) => (
-                <Form className="recipe-form">
+                <Form className="filter-form" >
                   <FormikControl
                     control="input"
                     type="text"
@@ -164,7 +163,7 @@ const Dashboard = ({ reduxUser }) => {
                   <FormikControl
                     control="input"
                     type="text"
-                    label="Ingredients, seperated by a ',' comma"
+                    label="Ingredients"
                     name="ingredients"
                   />
     

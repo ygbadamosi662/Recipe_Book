@@ -17,22 +17,22 @@ header {
   width: 100vw;
   padding: 2rem 4rem;
   background-color: rgb(100, 102, 113);
-  /* position: fixed; */
   z-index: 100;
 }
 
 header .auth {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  padding: 2rem;
 }
 
 .create-note-ham {
   display: flex;
-  /* flex-direction: row; */
+  gap: 0.5rem;
+  align-items: center;
   justify-content: space-evenly;
-  /* align-items: center; */
 }
 
 .home-btn {
