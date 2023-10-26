@@ -344,7 +344,7 @@ export const getFollowersOrFollowing = async (payload) => {
   * }
   */
   setAuthHeader();
-  return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/FollowUnfollow', payload);
+  return appAx.post('http://127.0.0.1:1245/api/v1/auth/users/FollowUnfollow/get', payload);
 };
 // auth routes: admin specific routes
 export const SUPER_ADMIN_manage_user_role = (payload) => {

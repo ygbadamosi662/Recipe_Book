@@ -10,7 +10,7 @@ function Notifications({ payload, command }) {
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(null);
 
   useEffect(() => {
     const orders = {

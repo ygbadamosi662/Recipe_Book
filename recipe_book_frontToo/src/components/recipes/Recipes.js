@@ -11,7 +11,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState(null);
   const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {

@@ -10,7 +10,7 @@ import "./Reviews.css";
 function Reviews({ payload, command }) {
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState(null);
   const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {

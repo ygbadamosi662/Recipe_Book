@@ -1309,6 +1309,11 @@ class UserController {
        // if count is true, consumer just wants a count of the filtered document
       if (value.count) {
         const user = await user_pr.exec();
+        if(!user) {
+          return res
+            .status(400)
+            .json({ msg: 'Invalid request: Cannot find user'});
+        }
         const give_count = () => {
           if(value.which === Which.followers) {
             return { count: user.followers ? user.followers.length : 0 }
@@ -1322,17 +1327,25 @@ class UserController {
             .json(give_count());
       }
 
-      let users = []
+      let users = null;
       const user = await user_pr
-        .populate(['followers', 'following'], 'name _id')
+        .populate('followers', 'name _id')
+        .populate('following', 'name _id')
         .exec();
+
+      if(!user) {
+        return res
+          .status(400)
+          .json({ msg: 'Invalid request: Cannot find user'});
+      }
+
       if (value.which === Which.followers) {
         users = user.followers;
       }
       if (value.which === Which.following) {
         users = user.following;
       }
-      
+
       return res
         .status(200)
         .json({ users: users ? users : [] })

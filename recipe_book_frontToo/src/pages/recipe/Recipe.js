@@ -23,7 +23,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
   });
   // const [payload, setPayload] = useState({});
   const [reviewCount, setReviewCount] = useState(0);
-  const [recipe, setRecipe] = useState({});
+  const [recipe, setRecipe] = useState(null);
 
   const navigate = useNavigate();
 
@@ -180,7 +180,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
     });
   }
 
-  return (recipe.name) ? (
+  return recipe ? (
     <div className="recipe">
         {!showReviews.showReviews && (
           <div className="not-reviews">
@@ -273,7 +273,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
           )
         }
     </div>
-  ) : 'Hello'
+  ) : ''
 }
 
 const mapStateToProps = state => {
