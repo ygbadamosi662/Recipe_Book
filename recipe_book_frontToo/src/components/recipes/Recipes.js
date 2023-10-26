@@ -11,7 +11,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState(null);
   const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
@@ -42,7 +42,6 @@ function Recipes({ payload, command, reduxLogRecipe }) {
           }
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -97,7 +96,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
               prev
             </button>
           )}
-          <span>{`${totalPages}/${page}`}</span>
+          <span>{`${page}/${totalPages}`}</span>
           {page < totalPages && (
             <button type="button" className="next-btm" onClick={handleNextClick}>
                 next

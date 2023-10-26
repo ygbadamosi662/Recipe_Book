@@ -371,7 +371,7 @@ class UserController {
       }
       let filter = {};
       // fill up filter
-      if(value.name) { filter.name = new RegExp(`${value['name']}`); }
+      if(value.name) { filter.name = value.name }
       if(value.ingredients) { 
         filter.ingredients = { $in: value['ingredients']};
       }
@@ -491,9 +491,6 @@ class UserController {
         delete filters.page;
         delete filters.size;
 
-        if (filters.name) {
-          filters.name = new RegExp(filters.name);
-        }
         filters.user = await user_promise;
         const count = await Recipe.countDocuments(filters);
 
@@ -507,7 +504,7 @@ class UserController {
 
       let filter = {};
       // fill up filter
-      if(value.name) { filter.name = new RegExp(`${value['name']}`); }
+      if(value.name) { filter.name = filter.name }
       if(value.ingredients) { 
         filter.ingredients = { $in: value['ingredients']};
       }
@@ -1312,6 +1309,11 @@ class UserController {
        // if count is true, consumer just wants a count of the filtered document
       if (value.count) {
         const user = await user_pr.exec();
+        if(!user) {
+          return res
+            .status(400)
+            .json({ msg: 'Invalid request: Cannot find user'});
+        }
         const give_count = () => {
           if(value.which === Which.followers) {
             return { count: user.followers ? user.followers.length : 0 }
@@ -1325,17 +1327,25 @@ class UserController {
             .json(give_count());
       }
 
-      let users = []
+      let users = null;
       const user = await user_pr
-        .populate(['followers', 'following'], 'name _id')
+        .populate('followers', 'name _id')
+        .populate('following', 'name _id')
         .exec();
+
+      if(!user) {
+        return res
+          .status(400)
+          .json({ msg: 'Invalid request: Cannot find user'});
+      }
+
       if (value.which === Which.followers) {
         users = user.followers;
       }
       if (value.which === Which.following) {
         users = user.following;
       }
-      
+
       return res
         .status(200)
         .json({ users: users ? users : [] })

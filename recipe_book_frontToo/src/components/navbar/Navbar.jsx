@@ -21,7 +21,7 @@ function Navbar({ reduxUserNotAuth }) {
   const [noteCount, setNoteCount] = useState(0);
 
   useEffect(() => {
-    if(auth) {
+    if(reduxUserNotAuth === false) {
       const filter = {
         count: true,
         status: "not read",

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useMutation } from "react-query";
 import { getUser, follow_unfollow } from "../../api_calls";
 import Holder from "../come_with_us/Holder";
 import { connect } from "react-redux";
 import { FaHeart } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
+import FullHouse from "../../components/followers_following/FullHouse";
 import "./User.css";
 
 
@@ -48,14 +48,9 @@ function User({ reduxLogRecipe, reduxUser }) {
 
   // to manage toggle state between faves and recipes
   const [choice, setChoice] = useState(true);
+  const [user, setUser] = useState(null);
+  const [showFullHouse, setShowFullHouse] = useState(false);
 
-  const {
-    mutate: fetchUser,
-    isLoading,
-    isError,
-    error,
-    data,
-  } = useMutation(getUser);  
 
   const navigate = useNavigate();  
 
@@ -64,38 +59,36 @@ function User({ reduxLogRecipe, reduxUser }) {
       toast.error("id is required", {
         position: toast.POSITION.TOP_RIGHT,
       });
+      return;
     }
-  
-    if(id) {
-      fetchUser(id);
-    }
-    
-  },[id, fetchUser]);
 
-  if(isLoading)
-  {
-    return <h2>Loading...</h2>
-  }
+    const fetchUser = async () => {
+      try {
+        const res = await getUser(id);
+        if (res.status === 200) {
+          if(res.data.user) {
+            setUser(res.data.user);
+          }
+        }
+      } catch (error) {
+        if (error.response) {
+          toast.error(error.response.data.msg, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        } else {
+          toast.error("Network error. Please try again later.", {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        }
+      }
+      };
+      fetchUser();
+  },[id]);
 
-  if(isError)
-  {
-    if(error?.response.status === 400) {
-      toast.error(`Bad Request: ${error?.response.data.msg}`, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-    }
-    if(error?.response.status >= 500) {
-        
-      toast.error("Server Error ", {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-    }
-    
-  }
 
   // Decides what to display in follow-unfollow-btn
   const if_follow_or_unfollow = () => {
-    return data?.data?.user.followers?.includes(reduxUser._id) ? "Unfollow" : "Follow";
+    return user.followers?.includes(reduxUser._id) ? "Unfollow" : "Follow";
   };
 
   const handleFollowUnfollow = async (e, id) => {
@@ -139,7 +132,7 @@ function User({ reduxLogRecipe, reduxUser }) {
         console.log(error);
       }
     }
-  }
+  };
 
   const handleRecipeClick = (e, id) => {
     e.preventDefault();
@@ -148,73 +141,97 @@ function User({ reduxLogRecipe, reduxUser }) {
     });
     navigate('/user/recipe');
   };
+
+  const handleFollowers_following_btn = (e) => {
+    e.preventDefault();
+    setShowFullHouse(true);
+  };
+
+  const handleBackToUserClick = (e) => {
+    e.preventDefault()
+    setShowFullHouse(false);
+  };
   
-  return data?.data?.user ? (
+  return user ? (
     <div className="user">
        <div className="user-meta">
           <div className="name">
-            {`${data?.data?.user.name.fname} ${data?.data?.user.name.lname}`}
+            {`${user.name.fname} ${user.name.lname}`}
           </div>
-          <span>{`${data?.data?.user.followers?.length} Followers`}</span>
-          <span>{`${data?.data?.user.following?.length} Following`}</span>
-          <button type="button" className="follow-unfollow-btn" onClick={(e) => handleFollowUnfollow(e, data?.data?.user._id)}>
+          <button type="button" className="followers-following-btn" onClick={(e) => handleFollowers_following_btn(e)}>
+            <span>{`${user.followers?.length} Followers`}</span>
+            <span>{`${user.following?.length} Following`}</span>
+          </button>
+          
+          <button type="button" className="follow-unfollow-btn" onClick={(e) => handleFollowUnfollow(e, user._id)}>
              {if_follow_or_unfollow()}
           </button>
        </div>
-       <div className="recipes">
-          <div className="toggle">
-           <Holder
-             name='faves'
-             clas={choice ? "active" : ""}
-             handleClick={handleChoice}
-             stylez={stylez}
-             display='My Faves'
-           />
+       {!showFullHouse && (
+            <div className="recipes">
+              <div className="toggle">
+               <Holder
+                 name='faves'
+                 clas={choice ? "active" : ""}
+                 handleClick={handleChoice}
+                 stylez={stylez}
+                 display='My Faves'
+               />
 
-           <Holder
-             name='recipes'
-             clas={!choice ? "active" : ""}
-             handleClick={handleChoice}
-             stylez={stylez}
-             display='My Recipes'
-           />
+               <Holder
+                 name='recipes'
+                 clas={!choice ? "active" : ""}
+                 handleClick={handleChoice}
+                 stylez={stylez}
+                 display='My Recipes'
+               />
 
-          </div>
-          {choice &&  data?.data?.user.recipes?.map((recipe, index) => {
-              return <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
-                        <h3 className="recipe-name">
-                            {`Name: ${recipe.name}`}
-                        </h3>
-                        <div className="recipe-type">
-                            {`Type: ${recipe.type}`}
-                        </div>
-                        <div className="recipe-permit">
-                            {`Permit: ${recipe.permit}`}
-                        </div>
-                        <div className="recipe-likes">
-                            <FaHeart /> {recipe.fave_count}
-                        </div>
-                     </div>
-            })
-          }
-          {!choice &&  data?.data?.user.faves?.map((recipe, index) => {
-              return <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
-                        <h3 className="recipe-name">
-                            {`Name: ${recipe.name}`}
-                        </h3>
-                        <div className="recipe-type">
-                            {`Type: ${recipe.type}`}
-                        </div>
-                        <div className="recipe-permit">
-                            {`Permit: ${recipe.permit}`}
-                        </div>
-                        <div className="recipe-likes">
-                            <FaHeart /> {recipe.fave_count}
-                        </div>
-                     </div>
-            })
-          }
-      </div>
+              </div>
+              {choice &&  user.recipes?.map((recipe, index) => {
+                  return <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
+                            <h3 className="recipe-name">
+                                {`Name: ${recipe.name}`}
+                            </h3>
+                            <div className="recipe-type">
+                                {`Type: ${recipe.type}`}
+                            </div>
+                            <div className="recipe-permit">
+                                {`Permit: ${recipe.permit}`}
+                            </div>
+                            <div className="recipe-likes">
+                                <FaHeart /> {recipe.fave_count}
+                            </div>
+                         </div>
+                })
+              }
+              {!choice &&  user.faves?.map((recipe, index) => {
+                  return <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
+                            <h3 className="recipe-name">
+                                {`Name: ${recipe.name}`}
+                            </h3>
+                            <div className="recipe-type">
+                                {`Type: ${recipe.type}`}
+                            </div>
+                            <div className="recipe-permit">
+                                {`Permit: ${recipe.permit}`}
+                            </div>
+                            <div className="recipe-likes">
+                                <FaHeart /> {recipe.fave_count}
+                            </div>
+                         </div>
+                })
+              }
+        </div>
+        )
+       }
+       { showFullHouse && (
+            <div className="fullhouse">
+              <button type="button" className="user-bk-btn" onClick={(e) => handleBackToUserClick(e)}>Go back to Recipes</button>
+              <FullHouse id={user._id}/>
+            </div>
+          )
+       }
+       
     </div>
   ) : ''
 }

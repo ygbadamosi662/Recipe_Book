@@ -10,7 +10,7 @@ function Notifications({ payload, command }) {
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(null);
 
   useEffect(() => {
     const orders = {
@@ -61,9 +61,8 @@ function Notifications({ payload, command }) {
     setPage(page - 1);
   };
 
-
   return (
-    <div className="notess">
+    <div className="notes">
       <h3>Notifications</h3>
       { notes ?
         notes?.map((note, index) => {
@@ -85,7 +84,7 @@ function Notifications({ payload, command }) {
               prev
             </button>
           )}
-          <span>{`${totalPages}/${page}`}</span>
+          <span>{`${page}/${totalPages}`}</span>
           {page < totalPages && (
             <button type="button" className="next-btm" onClick={handleNextClick}>
                 next

@@ -5,7 +5,7 @@ function Holder({ clas, handleClick, name, stylez, display }) {
   const myStyle = stylez(clas)
   return (
     <button
-      name={name}
+      name={name ? name : ""}
       className={clas}
       onClick={(event) => handle(event)}
       style={myStyle}
