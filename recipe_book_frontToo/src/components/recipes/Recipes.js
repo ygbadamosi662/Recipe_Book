@@ -5,9 +5,12 @@ import { getMyRecipes, getRecipes, ADMIN_getRecipes } from "../../api_calls";
 import { useNavigate } from "react-router-dom";
 import { FaHeart } from 'react-icons/fa';
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import "./Recipes.css";
 
 function Recipes({ payload, command, reduxLogRecipe }) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
@@ -42,6 +45,15 @@ function Recipes({ payload, command, reduxLogRecipe }) {
           }
         }
       } catch (error) {
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if (error.response) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -54,7 +66,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
       }
     };
     fetchRecipes();
-  }, [payload, command, page, setRecipes]);
+  }, [payload, command, page, setRecipes, navigate, dispatch]);
 
 
   const handleRecipeClick = (e, id) => {
@@ -74,7 +86,7 @@ function Recipes({ payload, command, reduxLogRecipe }) {
   };
 
   return (
-    <div className="mains">
+    <div className="mains-recipes">
       <div className="recipes">
         {recipes ? (
           recipes.map((recipe, index) => (

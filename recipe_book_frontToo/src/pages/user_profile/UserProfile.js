@@ -4,21 +4,28 @@ import { logUser } from "../../Redux/User/userActions";
 import { toast } from "react-toastify";
 import { updateUser } from "../../api_calls";
 import { Formik, Form } from "formik";
+import { useNavigate } from "react-router";
 import * as Yup from "yup";
 import FormikControl from "../../FormikControl";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
+import "./UserProfile.css";
 
 function UserProfile({ reduxUser, reduxLogUser }) {
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
   const [showPasswordField, setShowPasswordField] = useState(false);
 
-  // Set up the values for tracking changes in email, phone and change_pwd field of the form
   const [emailChanged, setEmailChanged] = useState(false);
   const [phoneChanged, setPhoneChanged] = useState(false);
   const [change_pwdChanged, setChange_pwdChanged] = useState(false);
 
-  // Listen for changes in specific fields and update the showPasswordField state
   useEffect(() => {
     if (emailChanged || phoneChanged || change_pwdChanged) {
       setShowPasswordField(true);
+      console.log("true", emailChanged, phoneChanged, change_pwdChanged)
     } else {
       setShowPasswordField(false);
     }
@@ -101,6 +108,15 @@ function UserProfile({ reduxUser, reduxLogUser }) {
       }
     } catch (error) {
       if (error.response) {
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if (error.response.status === 400) {
           toast.error(`${error.response.data.msg}`, {
             position: toast.POSITION.TOP_RIGHT,

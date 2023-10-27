@@ -1,12 +1,16 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useNavigate } from "react-router";
 import { getMyNotifications, ADMIN_getNotifications } from "../../api_calls";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import "./Notifications.css";
 
 function Notifications({ payload, command }) {
+  const dispatch = useDispatch();
 
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
@@ -37,7 +41,15 @@ function Notifications({ payload, command }) {
         }
       
       } catch (error) {
-        console.log(error)
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if (error.response) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -50,7 +62,7 @@ function Notifications({ payload, command }) {
       }
     };
     fetchNotes();
-  }, [command, page, haveNextPage, totalPages, payload]);
+  }, [command, page, haveNextPage, totalPages, payload, navigate, dispatch]);
   
 
   const handleNextClick = () => {
@@ -97,10 +109,4 @@ function Notifications({ payload, command }) {
   );
 }
 
-const mapStateToProps = state => {
-  return {
-    reduxUser: state.user.user,
-  }
-}
-
-export default connect(mapStateToProps, null)(Notifications);
+export default Notifications;

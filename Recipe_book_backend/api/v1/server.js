@@ -4,7 +4,7 @@ const { injectMalwares } = require('../v1/index');
 const { startServer } = require('./libs/boot');
 const express = require('express');
 const gracefulShutdown = require('express-graceful-shutdown');
-const { Role } = require('./enum_ish.js');
+const { Role, Gender } = require('./enum_ish.js');
 const { user_repo } = require('./repos/user_repo.js');
 const util = require('./util.js');
 require('dotenv').config();
@@ -27,7 +27,8 @@ const God = (async () => {
         fname: 'Recipe',
         lname: 'Book',
         aka: 'Food Book',
-      }
+      },
+      gender: Gender.other
     });
     console.log(`${process.env.APP_EMAIL}: We are open for business`);
   } catch (error) {

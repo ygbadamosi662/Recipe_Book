@@ -1,22 +1,28 @@
 const Role = {
-    user: 'USER',
-    admin: 'ADMIN',
-    super_admin: 'SUPER ADMIN',
+  user: 'USER',
+  admin: 'ADMIN',
+  super_admin: 'SUPER ADMIN',
 };
 
+const Gender = {
+  male: "MALE",
+  female: "FEMALE",
+  other: "OTHER"
+}
+
 const Type = { 
-    soup: 'SOUP',
-    pastry: 'PATRY',
-    pasta: 'PASTA',
-    pizza: 'PIZZA',
-    snacks: 'SNACKS',
-    rice: 'RICE',
-    food: 'FOOD',
+  soup: 'SOUP',
+  pastry: 'PATRY',
+  pasta: 'PASTA',
+  pizza: 'PIZZA',
+  snacks: 'SNACKS',
+  rice: 'RICE',
+  food: 'FOOD',
 };
 
 const Permit = {
-    private: 'PRIVATE',
-    public: 'PUBLIC',
+  private: 'PRIVATE',
+  public: 'PUBLIC',
 };
 
 const Status = {
@@ -71,4 +77,4 @@ const RedisFormatCombo = {
   },
 }
 
-module.exports = { Role, Type, Permit, Status, Which, Is_Verified, Collections, Power, RedisFormatCombo };
+module.exports = { Role, Type, Permit, Status, Which, Is_Verified, Collections, Power, RedisFormatCombo, Gender };

@@ -9,18 +9,26 @@ import { toast } from "react-toastify";
 import "./Signup.css";
 
 function Signup(props) {
-  const { reduxLogUser, goL, reduxUser } = props;
+  const { reduxLogUser, goL, reduxUser, reduxNotAuth } = props;
 
   // Formik initial values
   let initVal = {};
 
+  const gender = [
+    { key: "Gender", value: "" },
+    { key: "MALE", value: "MALE" },
+    { key: "FEMALE", value: "FEMALE" },
+    { key: "OTHER", value: "OTHER" },
+  ];
+
   // if redux user exists
-  if (reduxUser) {
+  if (reduxUser && (reduxNotAuth === false)) {
     initVal = reduxUser;
   } else {
     initVal = {
       fname: "",
       lname: "",
+      gender: "",
       email: "",
       phone: "",
       password: "",
@@ -31,6 +39,7 @@ function Signup(props) {
   const validationSchema = Yup.object({
     fname: Yup.string().required("Required"),
     lname: Yup.string().required("Required"),
+    gender: Yup.string().oneOf(["MALE", "FEMALE"]).required("Required"),
     email: Yup.string().email("Email not valid!").required("Required"),
     password: Yup.string()
       .matches(
@@ -48,13 +57,14 @@ function Signup(props) {
 
   // handles form submission
   const onSubmit = async (values) => {
-    const { fname, lname, email, password, phone } = values;
+    const { fname, lname, email, password, phone, gender } = values;
     const user = {
       fname: fname,
       lname: lname,
       email: email,
       password: password,
       phone: phone,
+      gender: gender
     };
 
     try {
@@ -99,6 +109,13 @@ function Signup(props) {
             label="Lastname"
             name="lname"
             className="input"
+          />
+
+          <FormikControl
+            control="select"
+            options={gender}
+            label="Gender"
+            name="gender"
           />
 
           <FormikControl
@@ -150,6 +167,7 @@ const mapStateToProps = (state) => {
   return {
     // gets user email if set
     reduxUser: state.user.user,
+    reduxNotAuth: state.user.not_auth,
   };
 };
 // sets user email to redux

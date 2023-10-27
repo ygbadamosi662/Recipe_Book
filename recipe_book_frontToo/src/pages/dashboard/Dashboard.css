@@ -19,10 +19,23 @@
 
 .filter-form {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   align-content: center;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: flex-start;
+  width: 75%;
+  /* background-color: black; */
+}
+
+.filter-form input {
+  height: 2rem;
+}
+
+.search-btn {
+  align-self: center;
+  height: 2.5rem;
+  width: 6rem;
+  border-radius: 0.5rem;
+  margin-left: 1rem;
 }
 
 .dash-bk-btn {

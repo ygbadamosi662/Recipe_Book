@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { signout } from "../../api_calls";
 import { connect } from "react-redux";
 import { logNot_Auth } from '../../Redux/User/userActions';
+import { resetStore } from '../../Redux/reset/reset_action';
 import { toast } from "react-toastify";
 
-function HamburgerMenu({ reduxLogNotAuth }) {
+function HamburgerMenu({ reduxLogNotAuth, reduxResetStore }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -29,15 +30,18 @@ function HamburgerMenu({ reduxLogNotAuth }) {
             position: toast.POSITION.TOP_RIGHT,
         });
         localStorage.removeItem("Jwt");
-        reduxLogNotAuth(true);
+        reduxResetStore();
         navigate('/');
       }
 
     } catch (error) {
-      if(error.response?.status === 401) {
-        toast.warning("Login again", {
-            position: toast.POSITION.TOP_RIGHT,
+      // handles token expiration, token blacklisted, token invalid, and token absent
+      if(error.response?.data?.jwt) {
+        toast.warning(error.response.data.jwt, {
+          position: toast.POSITION.TOP_RIGHT,
         });
+        localStorage.removeItem("Jwt");
+        reduxResetStore();
         navigate('/');
       }
 
@@ -81,6 +85,7 @@ function HamburgerMenu({ reduxLogNotAuth }) {
 const mapDispatchToProps = (dispatch) => {
   return {
     reduxLogNotAuth: (payload) => dispatch(logNot_Auth(payload)),
+    reduxResetStore: () => dispatch(resetStore()),
   };
 };
 

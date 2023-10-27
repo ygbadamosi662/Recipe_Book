@@ -37,7 +37,8 @@ class UserController {
               'followers',
               'following',
               'recipes',
-              'faves'
+              'faves',
+              'gender'
             ].join(' ')
             );
       }
@@ -619,7 +620,7 @@ class UserController {
           } else {
             return res
               .status(400)
-              .json({ Message: 'Invalid Credentials'})
+              .json({ msg: 'Invalid Credentials'})
           }
         }
         if (value.phone) {
@@ -628,7 +629,7 @@ class UserController {
           } else {
             return res
               .status(400)
-              .json({ Message: 'Invalid Credentials'})
+              .json({ msg: 'Invalid Credentials'})
           }
         }
         if (value.password) {
@@ -637,7 +638,7 @@ class UserController {
           } else {
             return res
               .status(400)
-              .json({ Message: 'Invalid Credentials'})
+              .json({ msg: 'Invalid Credentials'})
           }
         }
       }
@@ -925,9 +926,9 @@ class UserController {
     try {
       if (!req.params.id) {
         return res
-          .status(401)
+          .status(400)
           .json({
-            error: 'Invalid Request, id is required',
+            msg: 'Invalid Request, id is required',
           });
       }
       const rev = await Review
@@ -935,9 +936,9 @@ class UserController {
         .populate('user');
       if(!rev) {
         return res
-          .status(40)
+          .status(400)
           .json({
-            error: 'Invalid Request, review does not exist',
+            msg: 'Invalid Request, review does not exist',
           });
       }
 
@@ -1329,8 +1330,8 @@ class UserController {
 
       let users = null;
       const user = await user_pr
-        .populate('followers', 'name _id')
-        .populate('following', 'name _id')
+        .populate('followers', 'name _id gender')
+        .populate('following', 'name _id gender')
         .exec();
 
       if(!user) {

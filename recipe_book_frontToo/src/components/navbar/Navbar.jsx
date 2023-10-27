@@ -4,15 +4,15 @@ import { FaBell } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import HamburgerMenu from "./HamburgerMenu";
 import { getMyNotifications } from "../../api_calls";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import "./Navbar.css";
 
-
 //Navbar Component
 function Navbar({ reduxUserNotAuth }) {
-//   const navRef = useRef();
-  //checks user authentication
+  const dispatch = useDispatch();
 
   const auth = localStorage.getItem("Jwt") ? true : false;
   
@@ -33,6 +33,15 @@ function Navbar({ reduxUserNotAuth }) {
           }
         })
         .catch((error) => {
+          // handles token expiration, token blacklisted, token invalid, and token absent
+          if(error.response?.data?.jwt) {
+            toast.warning(error.response.data.jwt, {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+            localStorage.removeItem("Jwt");
+            dispatch(resetStore);
+            navigate('/');
+          }
           if (error.response && error.response.status >= 500) {
             toast.error('Server Error', {
               position: toast.POSITION.TOP_RIGHT,
@@ -44,7 +53,7 @@ function Navbar({ reduxUserNotAuth }) {
       // navigate bk to come_with_us page
       navigate('/');
     }
-  }, [auth, reduxUserNotAuth, navigate]);
+  }, [auth, reduxUserNotAuth, navigate, dispatch]);
 
   const take_home_page = async (e) => {
     e.preventDefault(); // Prevent the default form submission

@@ -6,7 +6,7 @@ const { Mail_sender } = require('../services/mail_service');
 const Joi = require('joi');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const { Role } = require('../enum_ish')
+const { Role, Gender } = require('../enum_ish')
 const mongoose = require('mongoose');
 const MongooseError = mongoose.Error;
 /**
@@ -28,6 +28,10 @@ class AppController {
           .required(),
         lname: Joi
           .string()
+          .required(),
+        gender: Joi
+          .string()
+          .valid(...Object.values(Gender))
           .required(),
         phone: Joi
           .string()
@@ -72,6 +76,7 @@ class AppController {
       },
       email: value.email,
       phone: value.phone,
+      gender: value.gender,
       role: Role.user,
     };
 
@@ -121,10 +126,11 @@ class AppController {
       }
       let user = {}
       
-      user = await user_repo.findByEmail(value.email_or_phone, ['name', 'password', 'role', 'id', 'email', 'phone']);
+      user = await user_repo.findByEmail(value.email_or_phone, ['name', 'password', 'role', 'id', 'email', 'phone', 'gender']);
       if(!user) {
-        user = await user_repo.findByPhone(value.email_or_phone, ['name', 'password', 'role', 'id', 'email']);
+        user = await user_repo.findByPhone(value.email_or_phone, ['name', 'password', 'role', 'id', 'email', 'gender']);
       }
+
       // validate user
       if (!user) {
         return response.status(400).json({
@@ -144,6 +150,7 @@ class AppController {
         email: user.email,
         role: user.role,
         _id: user.id,
+        gender: user.gender
       });
 
       return response

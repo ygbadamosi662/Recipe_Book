@@ -1,6 +1,6 @@
 const validator = require('validator');
 const { Schema } = require('mongoose');
-const { Role } = require('../../enum_ish');
+const { Role, Gender } = require('../../enum_ish');
 const { Recipe_str, User_str } = require('../../global_constants');
 
 const userSchema = new Schema({
@@ -65,6 +65,11 @@ const userSchema = new Schema({
     type: String,
     enum: Object.values(Role),
     default: Role.user,
+  },
+  gender: {
+    type: String,
+    enum: Object.values(Gender),
+    required: true,
   },
   resetPasswordToken: String,
   resetPasswordTokenExpires: Date,

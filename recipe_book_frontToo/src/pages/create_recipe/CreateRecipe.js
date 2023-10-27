@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { createRecipe } from "../../api_calls";
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import "./CreateRecipe.css";
 
 const styles = {
@@ -18,6 +20,8 @@ const styles = {
   },
 };
 function CreateRecipe({ reduxLogRecipe }) {
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
   const permit = [
@@ -87,7 +91,16 @@ function CreateRecipe({ reduxLogRecipe }) {
       }
     } catch (error) {
       if (error.response) {
-        console.log(error.response.data.msg);
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
+
         toast.error(error.response.data.msg, {
           position: toast.POSITION.TOP_RIGHT,
         });
@@ -147,7 +160,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             className="form-text-area"
           />
 
-          <FormikControl control="text-area" label="Preparation" name="guide" />
+          {/* <FormikControl control="text-area" label="Preparation" name="guide" /> */}
 
           <FormikControl
             control="select"
