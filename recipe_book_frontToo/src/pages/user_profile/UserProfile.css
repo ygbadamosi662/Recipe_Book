@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-=======
 /* Add your CSS styles here */
 .update-user-form {
   max-width: 400px;
@@ -38,5 +32,4 @@
 .submit-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
->>>>>>> e9761dfdfb03a15efe66a5b285ad85a6fcb469e7
 }
