@@ -39,13 +39,15 @@ function Login(props) {
 
     try {
       const res = await login(JSON.stringify(user));
-      setToken(res.data.token);
-      reduxLogUser(res.data.user);
-      toast.success(res.data.msg, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      reduxLogNotAuth(false);
-      navigate("/user/dash");
+      if(res.status === 200) {
+        setToken(res.data.token);
+        reduxLogUser(res.data.user);
+        toast.success(res.data.msg, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        reduxLogNotAuth(false);
+        navigate("/user/dash");
+      }
     } catch (error) {
       if (error.response) {
         console.log(error.response.data.msg);

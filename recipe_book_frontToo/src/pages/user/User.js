@@ -8,6 +8,8 @@ import { FaHeart } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
 import FullHouse from "../../components/followers_following/FullHouse";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import "./User.css";
 
 
@@ -28,6 +30,7 @@ const stylez = (clas) => {
 
 
 function User({ reduxLogRecipe, reduxUser }) {
+  const dispatch = useDispatch();
 
   const { id } = useParams();
   const handleChoice = (e) => {
@@ -72,6 +75,15 @@ function User({ reduxLogRecipe, reduxUser }) {
         }
       } catch (error) {
         if (error.response) {
+          // handles token expiration, token blacklisted, token invalid, and token absent
+          if(error.response?.data?.jwt) {
+            toast.warning(error.response.data.jwt, {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+            localStorage.removeItem("Jwt");
+            dispatch(resetStore);
+            navigate('/');
+          }
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
           });
@@ -83,7 +95,7 @@ function User({ reduxLogRecipe, reduxUser }) {
       }
       };
       fetchUser();
-  },[id]);
+  },[id, navigate, dispatch]);
 
 
   // Decides what to display in follow-unfollow-btn
@@ -122,9 +134,18 @@ function User({ reduxLogRecipe, reduxUser }) {
         toast.success("Server Error", {
             position: toast.POSITION.TOP_RIGHT,
         });
-        console.log(error);
       }
-      console.log(error)
+      if(error.response.status === 401) {
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
+      }
       if(error.response.status === 400) {
         toast.success(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -240,12 +261,12 @@ const mapStateToProps = state => {
   return {
     reduxUser: state.user.user,
   };
-}
+};
 
 const mapDispatchToProps = dispatch => {
   return {
     reduxLogRecipe: (recipe) => dispatch(logRecipe(recipe)),
   }
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(User);

@@ -3,11 +3,18 @@ import { connect } from "react-redux";
 import { logRecipe } from "../../Redux/Recipe/recipeActions";
 import { toast } from "react-toastify";
 import { updateRecipe } from "../../api_calls";
+import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FormikControl from "../../FormikControl";
 
 function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+  
   const which_permit = () => {
     if (reduxRecipe.permit === "PRIVATE") {
       return "PUBLIC";
@@ -18,6 +25,7 @@ function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
   };
 
   const init_permit = which_permit();
+
   const permit = [
     {
       key: reduxRecipe.permit,
@@ -111,6 +119,15 @@ function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
       }
     } catch (error) {
       if (error.response) {
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if (error.response.status === 400) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -123,7 +140,6 @@ function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
         });
         return;
       }
-      console.log(error);
     }
   };
 

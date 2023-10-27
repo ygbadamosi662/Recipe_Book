@@ -3,15 +3,22 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { logReviews } from "../../Redux/Review/reviewActions";
 import { getRecipeReviews, ADMIN_getReviews } from "../../api_calls";
+import { useNavigate } from "react-router";
 import { FaStar } from 'react-icons/fa';
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import "./Reviews.css";
 
 function Reviews({ payload, command }) {
+  const dispatch = useDispatch();
+
   const [page, setPage] = useState(1);
   const [haveNextPage, setHaveNextPage] = useState(false);
   const [reviews, setReviews] = useState(null);
   const [totalPages, setTotalPages] = useState(0)
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const orders = {
@@ -40,7 +47,15 @@ function Reviews({ payload, command }) {
           }
         }
       } catch (error) {
-        console.log(error)
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if (error.response) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -53,7 +68,7 @@ function Reviews({ payload, command }) {
       }
     };
     fetchReviews();
-  }, [payload, command, page, setReviews]);
+  }, [payload, command, page, setReviews, navigate, dispatch]);
 
   const handleNextClick = () => {
     setPage(page + 1);
@@ -62,7 +77,6 @@ function Reviews({ payload, command }) {
   const handlePrevClick = () => {
     setPage(page - 1);
   };
-
 
   const showStars = (stars) => {
     if (stars > 0) {
@@ -80,7 +94,8 @@ function Reviews({ payload, command }) {
   };
 
   return (
-    <div className="reviews">
+    <div className="mains-reviews">
+      <div className="reviews">
       { reviews ?
         reviews.map((review, index) => {
           return <div key={index} className="review">
@@ -97,6 +112,7 @@ function Reviews({ payload, command }) {
         })
         : <h2>No Review found....</h2>
       }
+      </div>
       {haveNextPage && (
         <div className="page-btns-container">
           {page > 1 && (

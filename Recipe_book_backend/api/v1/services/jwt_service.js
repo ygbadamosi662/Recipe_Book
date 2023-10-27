@@ -34,7 +34,7 @@ const authenticate_token = async (req, res, next) => {
       return res
         .status(401)
         .json({
-          msg: 'Invalid Request',
+          jwt: 'Token required'
         });
     }
 
@@ -43,13 +43,13 @@ const authenticate_token = async (req, res, next) => {
     if (jwt_token) {
       return res
       .status(401)
-      .json({ msg: 'Invalid Request, User should log in again' });
+      .json({ jwt: 'Token logged out, login again' });
     }
 
     // if token is valid
     jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
       if (err) {
-        return res.status(401).json({ msg: 'Token expired, login again'}); // Forbidden
+        return res.status(401).json({ jwt: 'Token expired, login again'}); // Forbidden
       }
       req.user = user;
       next();

@@ -11,17 +11,19 @@ import Reviews from "../../components/reviews/Reviews";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaHeart } from 'react-icons/fa';
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import "./Recipe.css";
 
 function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, reduxUser }) {
- 
+  const dispatch = useDispatch();
+
   const [showReviews, setShowReviews] = useState({
     showReviews: false,
     payload: {
       filter: reduxRecipe._id
     }
   });
-  // const [payload, setPayload] = useState({});
   const [reviewCount, setReviewCount] = useState(0);
   const [recipe, setRecipe] = useState(null);
 
@@ -60,7 +62,15 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
           }
         }
       } catch (error) {
-        console.log(error)
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if (error.response) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -73,7 +83,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
       }
     };
     gatherData();
-  }, [reduxRecipe._id, reduxLogRecipe]);
+  }, [reduxRecipe._id, reduxLogRecipe, navigate, dispatch]);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -87,6 +97,15 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
       
     } catch (error) {
       if(error.response) {
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if(error.response.status === 400) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,
@@ -128,6 +147,15 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
       }
     } catch (error) {
       if(error.response) {
+        // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
         if(error.response.status === 400) {
           toast.error(error.response.data.msg, {
             position: toast.POSITION.TOP_RIGHT,

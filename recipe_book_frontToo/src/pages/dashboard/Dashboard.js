@@ -6,10 +6,17 @@ import { Formik, Form } from "formik";
 import { getFollowersOrFollowing } from "../../api_calls";
 import Recipes from "../../components/recipes/Recipes";
 import FullHouse from "../../components/followers_following/FullHouse";
+import { useNavigate } from "react-router";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
 import FormikControl from "../../FormikControl";
 
 const Dashboard = ({ reduxUser }) => {
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
   const [showFullHouse, setShowFullHouse] = useState(false);
   const [ffCount, setFfCount] = useState({
     followers: 0,
@@ -69,9 +76,19 @@ const Dashboard = ({ reduxUser }) => {
         }
       } catch (error) {
         if (error.response) {
-          toast.error(error.response.data.msg, {
+          // handles token expiration, token blacklisted, token invalid, and token absent
+        if(error.response?.data?.jwt) {
+          toast.warning(error.response.data.jwt, {
             position: toast.POSITION.TOP_RIGHT,
           });
+          localStorage.removeItem("Jwt");
+          dispatch(resetStore);
+          navigate('/');
+        }
+
+        toast.error(error.response.data.msg, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
         } else {
           toast.error("Network error. Please try again later.", {
             position: toast.POSITION.TOP_RIGHT,
@@ -80,7 +97,7 @@ const Dashboard = ({ reduxUser }) => {
       }
     };
     fetchFf();
-  }, [reduxUser._id]);
+  }, [reduxUser._id, navigate, dispatch]);
 
   const handleFilterSubmit = (values) => {
     if (values.name === "" && values.ingredients === "" && values.type === "") {
@@ -122,6 +139,7 @@ const Dashboard = ({ reduxUser }) => {
 
   return (
     <div className="relative container home-container">
+      <h1>{reduxUser.fname}</h1>
       { !showFullHouse && (
           <button type="button" className="followers-following-btn" onClick={(e) => handleFollowers_following_btn(e)}>
             <span>{`Followers(${ffCount.followers})`}</span>/
@@ -162,7 +180,7 @@ const Dashboard = ({ reduxUser }) => {
                   <button
                     type="submit"
                     disabled={formik.isSubmitting}
-                    className="submit-btn"
+                    className="search-btn"
                   >
                     Search
                   </button>
