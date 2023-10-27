@@ -91,9 +91,8 @@ function Recipes({ payload, command, reduxLogRecipe }) {
         {recipes ? (
           recipes.map((recipe, index) => (
             <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)}>
-              <h3 className="recipe-name">{`Name: ${recipe.name}`}</h3>
-              <div className="recipe-type">{`Type: ${recipe.type}`}</div>
-              <div className="recipe-permit">{`Permit: ${recipe.permit}`}</div>
+              <span className="recipe-name"><h2>{recipe.name}</h2></span>
+              <div className="recipe-type"><h4>{recipe.type}</h4></div>
               <div className="recipe-likes">
                 <FaHeart /> {recipe.fave_count}
               </div>

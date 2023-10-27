@@ -3,3 +3,76 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+.user {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: fit-content;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: antiquewhite;
+}
+
+.user-recipes-holder .toggle {
+  display: flex;
+  width: 40%;
+}
+
+.user-recipes-holder .user-recipes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2rem;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  width: 20%;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.user .user-recipe {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;
+  background-color: plum;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user .recipe-owner {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.user .recipe-name {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.user .recipe-type {
+  font-size: 0.9rem;
+  color: #007bff; /* Custom color for the recipe type */
+  margin-bottom: 0.5rem;
+}
+
+.user .recipe-likes {
+  font-size: 1.2rem;
+  color: black;
+}
+
+.user .recipe-likes span {
+  color: black;
+}

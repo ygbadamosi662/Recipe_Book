@@ -17,6 +17,7 @@ import { store } from "./Redux/store";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const appStylez = {
   //backgroundColor: "#FAF9F6",
   height: "100vh",
@@ -25,9 +26,10 @@ const appStylez = {
 const queryClient = new QueryClient();
 
 function App() {
+
   return (
     <Provider store={store}>
-      <div className="App" style={appStylez}>
+      <div className="app" style={appStylez}>
         <React.Fragment>
           <Navbar />
           <QueryClientProvider client={queryClient}>

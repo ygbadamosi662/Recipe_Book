@@ -209,89 +209,93 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
   }
 
   return recipe ? (
-    <div className="recipe">
+    <div className="view-recipe">
         {!showReviews.showReviews && (
           <div className="not-reviews">
             <h3>{recipe?.name}</h3>
-            <button type="button" className="like-btn" onClick={(e) => handleLike(e)}>
-              <FaHeart />
-            </button>
-            <div className="recipe-owner">
-              {`${recipe.user.name.fname}  ${recipe.user.name.lname}`}
-              <button type="button" className="owner-btn" onClick={(e) => handleViewOwner(e, recipe.user._id)}>
-                View User
+            <div className="recipe-like-owner">
+              <button type="button" className="like-btn" onClick={(e) => handleLike(e)}>
+                <FaHeart />
               </button>
+              <div className="recipe-owner">
+                {`${recipe.user.name.fname}  ${recipe.user.name.lname}`}
+                <button type="button" className="owner-btn" onClick={(e) => handleViewOwner(e, recipe.user._id)}>
+                  View User
+                </button>
+              </div>
             </div>
 
             <div className="recipe-meta">
-                <div className="info">
-                    <label>Type</label>
-                    <span>{recipe?.type}</span>
-                </div>
-                <div className="info">
-                    <label>Access</label>
-                    <span>{recipe?.permit}</span>
-                </div>
-                <div className="info">
-                    <label>Likes</label>
-                    <span><FaHeart/>{recipe?.fave_count}</span>
-                </div>
-                <Formik
+              <div className="info">
+                  <label>Type: </label>
+                  <span>{recipe?.type}</span>
+              </div>
+              <div className="info">
+                  <label>Access: </label>
+                  <span>{recipe?.permit}</span>
+              </div>
+              <div className="info">
+                  <label>Likes: </label>
+                  <span><FaHeart color="red"/>{recipe?.fave_count}</span>
+              </div>
+              
+              <div className="info">
+                  <button type="button" onClick={(e) => handleReviewsClick(e)} className="reviews-btn">
+                    {`Reviews(${reviewCount})`}
+                  </button>
+              </div>
+              <div className="recipe-ingredients-container">
+                <h3>Ingredients</h3>
+                { recipe?.ingredients ?
+                  recipe.ingredients.map((ing, index) => {
+                    return <span key={index} className="recipe-ingredient">
+                              {`${ing},`}
+                           </span>
+                  })
+                  : <h2>Nothing to see here....</h2>
+                }
+              </div>
+              <div className="recipe-guides">
+                  <h3>Preparation</h3>
+                  { recipe?.guide ? recipe.guide : "Nothing to show"}
+              </div>
+              { (reduxUser._id === reduxRecipe._id) && (
+                  <div className="recipe-update">
+                    <button type="button" onClick={(e) => handleUpdate(e)} className="recipe-update-btn">
+                      UPDATE
+                    </button>
+                  </div>
+                )
+              }
+            </div>
+            <Formik
                   initialValues={form_init_value}
                   onSubmit={handleReviewSubmit}
                   validationSchema={validationSchema}
                 >
-                  {(formik) => (
-                    <Form className="review-recipe" >
-                    
-                      <FormikControl
-                        control="text-area"
-                        label="Review"
-                        name="comment"
-                        className="form-text-area"
-                      />
-                      <StarRating totalStars={5}/>
+                {(formik) => (
+                  <Form className="review-recipe" >
                   
-                      <button
-                        type="submit"
-                        disabled={!formik.isValid || formik.isSubmitting}
-                        className="submit-btn"
-                      >
-                        Review
-                      </button>
-                    </Form>
-                  )}
-                </Formik>
-                <div className="info">
-                    <button type="button" onClick={(e) => handleReviewsClick(e)} className="reviews-btn">
-                      {`Reviews(${reviewCount})`}
+                    <FormikControl
+                      control="text-area"
+                      label="Review"
+                      name="comment"
+                      className="form-text-area"
+                    />
+                    <StarRating totalStars={5}/>
+                
+                    <button
+                      type="submit"
+                      disabled={!formik.isValid || formik.isSubmitting}
+                      className="review-submit-btn"
+                    >
+                      Review
                     </button>
-                </div>
-            </div>
-            <div className="recipe-ingredients">
-                <h3>Ingredients</h3>
-                { recipe?.ingredients ?
-                  recipe.ingredients.map((ing, index) => {
-                    return <h4 key={index} className="recipe-ingredient">
-                              {ing}
-                           </h4>
-                  })
-                  : <h2>Nothing to see here....</h2>
-                }
-            </div>
-            <div className="recipe-guides">
-                <h3>Preparation</h3>
-                { recipe?.guide ? recipe.guide : "Nothing to show"}
-            </div>
-            { (reduxUser._id === reduxRecipe._id) && (
-                <div className="recipe-update">
-                  <button type="button" onClick={(e) => handleUpdate(e)} className="recipe-update-btn">
-                    UPDATE
-                  </button>
-                </div>
-              )
-            }
-          </div>)
+                  </Form>
+                )}
+            </Formik>
+          </div>
+          )
         }
         { (showReviews.showReviews === true) && (
             <div className="reviews">

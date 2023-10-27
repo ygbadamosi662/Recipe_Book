@@ -16,7 +16,7 @@ const styles = {
   form: {
     display: "grid",
     borderRadius: "0.5rem",
-    color: "white",
+    // color: "white",
   },
 };
 function CreateRecipe({ reduxLogRecipe }) {
@@ -119,14 +119,18 @@ function CreateRecipe({ reduxLogRecipe }) {
       initialValues={form_init_value}
       validationSchema={validationSchema}
     >
+      
       {(formik) => (
-        <Form className="recipe-form" style={styles.form}>
+        
+        <Form className="recipe-create-form" style={styles.form}>
+          <h2 style={{marginRight: "3rem"}}>Create Recipe</h2>
+          
           <FormikControl
             control="input"
             type="text"
             label="Recipe Name"
             name="name"
-            className="input"
+            className="recipe-name"
           />
 
           <FormikControl
@@ -134,7 +138,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Describe Recipe"
             name="description"
-            className="input"
+            className="recipe-desc"
           />
 
           <FormikControl
@@ -142,7 +146,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Type"
             name="type"
-            className="input"
+            className="recipe-type"
           />
 
           <FormikControl
@@ -150,7 +154,7 @@ function CreateRecipe({ reduxLogRecipe }) {
             type="text"
             label="Ingredients, seperated by a ',' comma"
             name="ingredients"
-            className="input"
+            className="recipe-ingredients"
           />
 
           <FormikControl
@@ -160,19 +164,18 @@ function CreateRecipe({ reduxLogRecipe }) {
             className="form-text-area"
           />
 
-          {/* <FormikControl control="text-area" label="Preparation" name="guide" /> */}
-
           <FormikControl
             control="select"
             options={permit}
             label="Access"
             name="permit"
+            className="recipe-permit"
           />
 
           <button
             type="submit"
             disabled={!formik.isValid || formik.isSubmitting}
-            className="submit-btn"
+            className="recipe-create-btn"
           >
             Create
           </button>

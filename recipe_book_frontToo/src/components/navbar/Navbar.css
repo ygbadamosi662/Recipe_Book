@@ -16,7 +16,8 @@ header {
   height: 80px;
   width: 100vw;
   padding: 2rem 4rem;
-  background-color: rgb(100, 102, 113);
+  /* background-color: rgb(100, 102, 113); */
+  background-color: plum;
   z-index: 100;
 }
 
@@ -63,6 +64,7 @@ header .auth {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .auth {

@@ -5,17 +5,53 @@
   box-sizing: border-box;
 }
 
-.recipe {
-  background-color: #f9f9f9;
+.view-recipe {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
   border: 1px solid #ccc;
   border-radius: 0.5rem;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: antiquewhite;
+}
+
+.not-reviews {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+
+}
+
+.recipe-like-owner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
 }
 
 .recipe-owner {
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  /* margin-bottom: 0.5rem; */
+}
+
+.info {
+  background-color: plum;
+  border-radius: 0.5rem;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.like-btn {
+  margin-top: 1.5rem;
 }
 
 .recipe h3 {
@@ -24,35 +60,34 @@
 }
 
 .recipe-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem; /* Adds spacing between meta information */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  width: 80%;
 }
 
-.info {
-  flex: 1;
+.recipe-guides {
+  grid-row: 2/4;
+  grid-column: 2/4;
 }
 
 .info label {
   font-weight: bold;
 }
 
-.recipe-ingredients {
-  margin-top: 1rem;
-}
-
-.recipe-ingredients h4 {
-  font-size: 1.1rem;
-  margin-bottom: 0.3rem;
-}
-
-.recipe-guides {
-  margin-top: 1rem;
-}
-
 .recipe-guides p {
   font-size: 1rem;
   margin-bottom: 0.5rem;
+}
+
+.review-recipe {
+  margin-top: 1rem;
+}
+
+.review-recipe .form-text-area {
+  width: 15rem;
+  border: 1px solid black;
 }
 
 button {

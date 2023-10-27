@@ -4,19 +4,14 @@
   box-sizing: border-box;
 }
 
-.mains-fullhouse {
-  
-}
-
 .mains-fullhouse .toggle{
   display: flex;
-  /* gap: 0.5rem; */
   width: 40%;
 }
 
 .users {
   display: flex;
-  gap: 5rem;
+  gap: 2rem;
   justify-content: flex-start;
   align-content: center;
   padding: 1rem;

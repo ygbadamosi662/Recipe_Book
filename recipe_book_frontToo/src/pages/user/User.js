@@ -177,72 +177,64 @@ function User({ reduxLogRecipe, reduxUser }) {
     <div className="user">
        <div className="user-meta">
           <div className="name">
-            {`${user.name.fname} ${user.name.lname}`}
+            <h2>{`${user.name.fname} ${user.name.lname}`}</h2>
           </div>
           <button type="button" className="followers-following-btn" onClick={(e) => handleFollowers_following_btn(e)}>
-            <span>{`${user.followers?.length} Followers`}</span>
-            <span>{`${user.following?.length} Following`}</span>
+            <span>{`Followers(${user.followers?.length})`}</span>/
+            <span>{`Following(${user.following?.length})`}</span>
           </button>
           
-          <button type="button" className="follow-unfollow-btn" onClick={(e) => handleFollowUnfollow(e, user._id)}>
-             {if_follow_or_unfollow()}
-          </button>
+          { (user._id !== reduxUser._id) && (
+              <button type="button" className="follow-unfollow-btn" onClick={(e) => handleFollowUnfollow(e, user._id)}>
+                {if_follow_or_unfollow()}
+              </button>
+            )
+          }
        </div>
-       {!showFullHouse && (
-            <div className="recipes">
-              <div className="toggle">
-               <Holder
-                 name='faves'
-                 clas={choice ? "active" : ""}
-                 handleClick={handleChoice}
-                 stylez={stylez}
-                 display='My Faves'
-               />
-
-               <Holder
-                 name='recipes'
-                 clas={!choice ? "active" : ""}
-                 handleClick={handleChoice}
-                 stylez={stylez}
-                 display='My Recipes'
-               />
-
-              </div>
-              {choice &&  user.recipes?.map((recipe, index) => {
-                  return <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
-                            <h3 className="recipe-name">
-                                {`Name: ${recipe.name}`}
-                            </h3>
-                            <div className="recipe-type">
-                                {`Type: ${recipe.type}`}
-                            </div>
-                            <div className="recipe-permit">
-                                {`Permit: ${recipe.permit}`}
-                            </div>
+       {!showFullHouse && 
+        (
+          <div className="user-recipes-holder">
+            <div className="toggle">
+             <Holder
+               name='faves'
+               clas={choice ? "active" : ""}
+               handleClick={handleChoice}
+               stylez={stylez}
+               display='My Faves'
+             />
+             <Holder
+               name='recipes'
+               clas={!choice ? "active" : ""}
+               handleClick={handleChoice}
+               stylez={stylez}
+               display='My Recipes'
+             />
+            </div>
+            <div className="user-recipes">
+              {!choice &&  user.recipes?.map((recipe, index) => {
+                  return <div key={index} className="user-recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
+                    <span className="recipe-name"><h2>{recipe.name}</h2></span>
+                    <span className="recipe-type"><h4>{recipe.type}</h4></span>
+                    <div className="recipe-likes">
+                      <FaHeart color="red"/> {recipe.fave_count}
+                    </div>
+                            
+                  </div>
+                })
+              }
+              {choice &&  user.faves?.map((recipe, index) => {
+                  return <div key={index} className="user-recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
+                            <span className="recipe-name"><h2>{recipe.name}</h2></span>
+                            <span className="recipe-type"><h4>{recipe.type}</h4></span>
                             <div className="recipe-likes">
-                                <FaHeart /> {recipe.fave_count}
+                              <FaHeart color="red"/> {recipe.fave_count}
                             </div>
                          </div>
                 })
               }
-              {!choice &&  user.faves?.map((recipe, index) => {
-                  return <div key={index} className="recipe" onClick={(e) => handleRecipeClick(e, recipe._id)} >
-                            <h3 className="recipe-name">
-                                {`Name: ${recipe.name}`}
-                            </h3>
-                            <div className="recipe-type">
-                                {`Type: ${recipe.type}`}
-                            </div>
-                            <div className="recipe-permit">
-                                {`Permit: ${recipe.permit}`}
-                            </div>
-                            <div className="recipe-likes">
-                                <FaHeart /> {recipe.fave_count}
-                            </div>
-                         </div>
-                })
-              }
-        </div>
+            </div>
+            
+          </div>
         )
        }
        { showFullHouse && (

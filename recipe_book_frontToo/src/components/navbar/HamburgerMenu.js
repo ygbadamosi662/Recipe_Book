@@ -8,7 +8,7 @@ import { logNot_Auth } from '../../Redux/User/userActions';
 import { resetStore } from '../../Redux/reset/reset_action';
 import { toast } from "react-toastify";
 
-function HamburgerMenu({ reduxLogNotAuth, reduxResetStore }) {
+function HamburgerMenu({ reduxResetStore, reduxUser }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -19,6 +19,11 @@ function HamburgerMenu({ reduxLogNotAuth, reduxResetStore }) {
   const to_profile = async (e) => {
     e.preventDefault(); // Prevent the default form submission
     navigate('/user/profile');
+  };
+
+  const to_recipes = async (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    navigate(`/user/user/${reduxUser._id}`);
   };
 
   const handleLogOut = async (e) => {
@@ -66,6 +71,11 @@ function HamburgerMenu({ reduxLogNotAuth, reduxResetStore }) {
         <div className="menu-items">
           <ul>
             <li>
+                <button onClick={to_recipes} className="user-recipes-btn" type="button">
+                    My Recipes
+                </button>
+            </li>   
+            <li>
                 <button onClick={to_profile} className="profile-btn" type="button">
                     Profile
                 </button>
@@ -82,6 +92,12 @@ function HamburgerMenu({ reduxLogNotAuth, reduxResetStore }) {
   );
 }
 
+const mapStateToProps = state => {
+  return {
+    reduxUser: state.user.user,
+  };
+};
+
 const mapDispatchToProps = (dispatch) => {
   return {
     reduxLogNotAuth: (payload) => dispatch(logNot_Auth(payload)),
@@ -89,4 +105,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(HamburgerMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(HamburgerMenu);
