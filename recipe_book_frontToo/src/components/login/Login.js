@@ -25,7 +25,7 @@ function Login(props) {
     password: Yup.string()
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*()]{8,}$/,
-        "password not valid"
+        "Password must have atleast one lowercase letter, one uppercase letter, one digit, one special chararcters and a minimum lenght of 8 chararcters"
       )
       .required("Required"),
   });
