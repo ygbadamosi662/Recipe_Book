@@ -1,8 +1,8 @@
 # Getting Started with Create React App
 
 ## Contributors
-[Yusuf Adura Gbadamosi](https://github.com/ygbadamosi662)
-[Arafat002](https://github.com/Arafat002)
+1. [Yusuf Adura Gbadamosi](https://github.com/ygbadamosi662)
+1. [Arafat002](https://github.com/Arafat002)
 
 ## Installation
 [HERE](recipe_book_frontend) in your terminal run `npm install`

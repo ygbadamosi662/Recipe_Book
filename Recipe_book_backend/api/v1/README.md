@@ -1,13 +1,13 @@
 # Recipe Book V1
 
 ## Contributors
-[Yusuf Adura Gbadamosi](https://github.com/ygbadamosi662)
-[Arafat002](https://github.com/Arafat002)
+1. [Yusuf Adura Gbadamosi](https://github.com/ygbadamosi662)
+1. [Arafat002](https://github.com/Arafat002)
 
 ## Prerequisites
-1 Mongo db version v6.0.8 server on
-1 A .env file [here](/Recipe_book_backend/api/v1)
-1 .env expected key/values 👇
+1. Mongo db version v6.0.8 server on
+1. A .env file [here](/Recipe_book_backend/api/v1)
+1. .env expected key/values 👇
 ```
 DB_USER=
 DB_PWD=
