@@ -1,13 +1,11 @@
-// Footer.js
-
 import React from "react";
 import "./Footer.css";
 
 const Footer = () => {
   return (
-    <footer>
+    <footer >
       <div className="containner">
-        <p>&copy; {new Date().getFullYear()} Your Recipe App</p>
+        <p>&copy; {new Date().getFullYear()} Recipe App</p>
         <ul className="footer-links">
           <li>
             <a href="/terms">Terms of Service</a>

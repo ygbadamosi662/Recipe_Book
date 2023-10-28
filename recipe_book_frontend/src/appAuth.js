@@ -11,33 +11,27 @@ export const isAuthenticated = () => {
 };
 
 export const getToken = () => {
-  const jwt = localStorage.getItem('jwt');
-  if (jwt) {
-    if (isExpired(jwt) === true) {
-      localStorage.removeItem('jwt');
-      return null;
-    }
-
-    return JSON.parse(jwt);
-    
-  }
+  const jwt = localStorage.getItem('Jwt');
   return jwt;
 };
 
 export const setToken = (jwt) => {
   if (jwt) {
-    localStorage.setItem('jwt', JSON.stringify(jwt));
+    localStorage.setItem('Jwt', jwt);
   }
   else {
-    localStorage.removeItem('jwt');
+    localStorage.removeItem('Jwt');
   }
 };
 
-export const isExpired = (jwt) => {
+export const isExpired = () => {
   try {
-    const decoded = decodeToken(jwt);
-    const milliseconds = decoded.exp * 1000;
-    return Date.now() > milliseconds;
+    const token = getToken();
+    if(token) {
+      const decoded = decodeToken(token);
+      const milliseconds = decoded.exp * 1000;
+      return Date.now() > milliseconds;
+    }
   } catch (err) {
     console.log(err);
     return true;
@@ -53,8 +47,6 @@ export const decodeToken = (jwt) => {
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem('jwt');
+export const removeToken = () => {
+  localStorage.removeItem('Jwt');
 };
-
-

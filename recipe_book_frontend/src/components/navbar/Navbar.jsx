@@ -1,103 +1,111 @@
-import { useRef } from "react";
-import { FaBars, FaTimes } from "react-icons/fa"; // imported icons from react-icons
+import React from "react";
+import { useEffect, useState } from "react";
+import { FaBell } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom";
+import HamburgerMenu from "./HamburgerMenu";
+import { getMyNotifications } from "../../api_calls";
+import { useDispatch } from "react-redux";
+import { resetStore } from "../../Redux/reset/reset_action";
+import { connect } from "react-redux";
+import { toast } from "react-toastify";
 import "./Navbar.css";
 
-
 //Navbar Component
-function Navbar() {
-  const navRef = useRef();
+function Navbar({ reduxUserNotAuth }) {
+  const dispatch = useDispatch();
 
-  //checks user authentication
-  const auth = localStorage.getItem("Auth") ? true : false;
+  const auth = localStorage.getItem("Jwt") ? true : false;
+  
+  const navigate = useNavigate();
 
-  // ShowNavbar toggles the visibility of the navbar
-  const showNavbar = () => {
-    console.log(navRef.current);
-    navRef.current.classList.toggle("responsive_nav");
-  };
+  const [noteCount, setNoteCount] = useState(0);
 
-  const handleClick = () => {
-    showNavbar(false);
-  };
-  // removes the 'Auth' when user id logged out
-  const handleLogOut = () => {
-    localStorage.removeItem("Auth");
-    // {auth} && auth = false;
-  };
+  useEffect(() => {
+    if(reduxUserNotAuth === false) {
+      const filter = {
+        count: true,
+        status: "not read",
+      };
+      getMyNotifications(JSON.stringify(filter))
+        .then((response) => {
+          if (response.status === 200) {
+            setNoteCount(response.data.count);
+          }
+        })
+        .catch((error) => {
+          // handles token expiration, token blacklisted, token invalid, and token absent
+          if(error.response?.data?.jwt) {
+            toast.warning(error.response.data.jwt, {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+            localStorage.removeItem("Jwt");
+            dispatch(resetStore);
+            navigate('/');
+          }
+          if (error.response && error.response.status >= 500) {
+            toast.error('Server Error', {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+          }
+      });
+    }
+    if(reduxUserNotAuth) {
+      // navigate bk to come_with_us page
+      navigate('/');
+    }
+  }, [auth, reduxUserNotAuth, navigate, dispatch]);
 
-  //used to display greetings on the navbar when user logged in
-  const name = "Omolara";
+  const take_home_page = async (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    navigate('/user/dash');
+  }
+
+  const to_create_recipe_page = async (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    navigate('/user/create/recipe');
+  }
+
+  const handleNotesClick = (e) => {
+    e.preventDefault(); // Prevent the default form submission
+    navigate('/user/notes');
+  }
+
   return (
-    <header className="relative">
-      <h1>Recipe Book</h1>
-      {/* <nav ref={navRef}> */}
-      {/* div component for nav links */}
-      <div className="nav" ref={navRef}>
-        <div
-          //ternary operator to make the link active when you're on the page
-          className={` `}
-          to=""
-          onClick={handleClick}
-        >
-          <a href="/">Home</a>
-        </div>
-
-        <div className={``} onClick={handleClick} to="">
-          <a href="/recipe">Recipe</a>
-        </div>
-        <div className={``} onClick={handleClick} to="">
-          <a href="javascript:void(0)">Favorite</a>
-        </div>
-        {auth && (
-          <div className={``} to="" onClick={handleClick}>
-            <a href="javascript:void(0)">Profile</a>
-          </div>
-        )}
-      </div>
-      <div className="nav">
-        {!auth ? (
-          <div className="membership">
-            <div className={``} to="" onClick={handleClick}>
-              <a href="/login">Sign In</a>
+    <header className="nav">
+      {(auth && (reduxUserNotAuth === false)) ? (
+          <div className="auth">
+            <div className="home">
+              <button className="home-btn" onClick={take_home_page} type="button">
+                HOME
+              </button>
             </div>
-            <button className="sign-up" onClick={handleClick}>
-              <div className={``} to="">
-                <a href="/signup"> Sign up </a>
+            <div className="create-note-ham">
+              <button className="create-recipe-btn" onClick={to_create_recipe_page} type="button">
+                CREATE RECIPE
+              </button>
+              <div className="note-div">
+                <button type="button" className="notification-btn" onClick={handleNotesClick}>
+                  <FaBell className="notification-badge"></FaBell>
+                  <span>{noteCount}</span>
+                </button>
               </div>
-            </button>
+              <HamburgerMenu />
+            </div>
           </div>
+          
         ) : (
-          <div className=" membership">
-            <button className="logout" onClick={handleLogOut}>
-              <div className={``} to="" onClick={handleClick}>
-                Log out
-              </div>
-            </button>
-            <span className="greeting">Hi, {name}</span>
+          <div className="no-auth">
+            <h1>Recipe Book</h1>
           </div>
-        )}
-      </div>
-      {/* button to close navbar on mobile */}
-      {/* <button className="nav-btn nav-close-btn" onClick={showNavbar}>
-          <FaTimes />
-        </button> */}
-      {/* </nav> */}
-      {/* display greeting when authenticated */}
-      {auth && <span className="greeting1">Hi, {name}</span>}
-
-      {/* Hambuger button to open navbar menu */}
-      <div className="hamburger-button " >
-        <button className="nav-btn" onClick={showNavbar}>
-          <FaBars />
-        </button>
-        {/* <div className="hamburger-details">
-          <a href="javascript:void(0)">Home</a>
-          <a href="javascript:void(0)">Recipe</a>
-          <a href="javascript:void(0)">Favourite</a>
-        </div> */}
-      </div>
+      )}
     </header>
   );
 }
 
-export default Navbar;
+const mapStateToProps = state => {
+  return {
+    reduxUserNotAuth: state.user.not_auth
+  }
+}
+
+export default connect(mapStateToProps, null)(Navbar);

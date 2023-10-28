@@ -13,211 +13,114 @@
   --textColor: #000;
 }
 header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   height: 80px;
   width: 100vw;
-  padding: 0 4rem;
-  background-color: #fff;
-  position: fixed;
+  padding: 2rem 4rem;
+  /* background-color: rgb(100, 102, 113); */
+  background-color: plum;
   z-index: 100;
-  /* background-color: red; */
 }
 
-header h1 {
-  font-size: 2.5rem;
-  font-family: "Times New Roman", Times, serif;
-  font-style: italic;
+header .auth {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 2rem;
 }
-.nav a {
-  /* margin: 0 1rem; */
-  font-size: 1.5rem;
-  color: #000;
-  text-decoration: none;
 
-  cursor: pointer;
+.create-note-ham {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-evenly;
 }
+
+.home-btn {
+  height: 2.5rem;
+  width: 6rem;
+}
+
+.notification-badge {
+  position: relative;
+}
+
+.notification-badge::after {
+  content: attr(data-badge);
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+/* styles.css */
 .nav {
-  gap: 2rem;
-  /* margin-left: auto; */
-}
-
-.nav a:hover {
-  color: var(--textColor);
-}
-.active {
-  color: var(--mainColor);
-}
-
-.membership {
-  gap: 2rem;
+  color: #fff;
+  padding: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
 }
 
-header .nav-btn {
-  padding: 5px;
-  cursor: pointer;
-  background: transparent;
+.auth {
+  display: flex;
+  align-items: center;
+}
+
+.no-auth {
+  text-align: center;
+}
+
+.home-btn,
+.create-recipe-btn {
+  background-color: #fff;
+  color: #007bff;
   border: none;
-  outline: none;
-  color: var(--textColor);
-  /* visibility: hidden; */
-  /* display: none; */
-  opacity: 0;
-  font-size: 1.8rem;
-}
-
-.nav-btn {
-  display: none;
-}
-
-.nav button {
-  width: 7rem;
-  height: 3rem;
-  font-size: 1.5rem;
-  border-radius: 10px;
-  border: 0;
+  padding: 0.5rem 1rem;
+  margin-right: 1rem;
   cursor: pointer;
+  border-radius: 0.25rem;
+  font-weight: bold;
 }
 
-.sign-up {
-  display: flex;
-  justify-content: center;
-  font-size: 20px;
-  align-items: center;
-  background-color: var(--mainColor) ;
+.home-btn:hover,
+.create-recipe-btn:hover {
+  background-color: #f0f0f0;
 }
-.sign-up a{
+
+.notification-badge {
+  font-size: 1.2rem;
+  margin-right: 0.2rem;
+}
+
+.note-div span {
+  background-color: #ff5b5b;
   color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 
-.nav button:hover {
-  color: var(--mainColor);
-}
-.nav a:hover{
-  color: var(--mainColor);
+h1 {
+  font-size: 2rem;
 }
 
-header div,
-.nav {
-  display: flex;
-  align-items: center;
-}
-
-
-.greeting {
-  display: none;
-}
-.greeting1 {
-  margin-left: auto;
-  font-size: 1.5rem;
-  color: var(--mainColor);
-}
-
-@media only screen and (max-width: 1024px) {
-  header .nav-btn {
-    visibility: visible;
-    opacity: 1;
-  }
-  header {
-    display: flex;
-    /* align-items: center; */
-    /* justify-content: space-between; */
-    height: 80px;
-    width: 100vw;
-    padding: 0 2rem;
-    background-color: #fff;
-    position: relative;
-  }
-  .nav {
-    position: fixed;
-    top: -100vh;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    display: flex;
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+  .auth {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    background-color: var(--mainColor);
-    transition: 1s;
-  }
-  h1 {
-    font-size: 1.5rem;
+    align-items: flex-start;
   }
 
-  .hamburger-button {
-    position: relative;
-  }
-
-  .hamburger-details {
-    display: flex;
-    flex-direction: column;
-    width: 10rem;
-    /* height: 10rem; */
-    /* padding: 1rem; */
-    border: 1px solid var(--mainColor);
-    border-radius: 10px;
-    position: absolute;
-    margin-top: 8.5rem;
-    margin-left: -7rem;
-    /* display: none; */
-  }
-
-  .hamburger-details a {
-    padding: 1rem;
-    border-bottom: .2px solid var(--mainColorLight);
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    text-decoration: none;
-    color: #000;
-    font-size: larger;
-  }
-
-  header .responsive_nav {
-    transform: translateY(100vh);
-  }
-
-  nav .nav-close-btn {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-  }
-
-  .nav-btn {
-    display: block;
-  }
-
-  nav a {
-    font-size: 1.5rem;
-  }
-
-  nav a:hover {
-    color: var(--mainColorLight);
-  }
-
-  .active {
-    color: #fff;
-  }
-
-  nav button a:hover {
-    color: var(--mainColor);
-  }
-
-  nav button .active {
-    color: var(--mainColor);
-  }
-  .greeting {
-    display: block;
-    font-size: 1.2rem;
-    color: var(--mainColorLight);
-    /* float: right; */
-  }
-
-  .greeting1 {
-    display: none;
+  .home-btn,
+  .create-recipe-btn {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
   }
 }
