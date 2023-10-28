@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { connect } from "react-redux";
 import { logStars  } from '../../Redux/User/userActions';
 const StarRating = ({ totalStars, reduxLogStars }) => {
   const [rating, setRating] = useState(0);
 
+  useEffect(() => {
+    reduxLogStars(rating);
+  }, [rating, reduxLogStars])
+
   const handleStarClick = (selectedRating) => {
     setRating(selectedRating);
-    reduxLogStars(rating);
   };
+
 
   return (
     <div>

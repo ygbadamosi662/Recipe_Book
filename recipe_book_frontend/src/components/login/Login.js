@@ -30,7 +30,7 @@ function Login(props) {
       .required("Required"),
   });
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values, actions) => {
     const { email_or_phone, password } = values;
     const user = {
       email_or_phone: email_or_phone,
@@ -61,6 +61,7 @@ function Login(props) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+    actions.setSubmitting(false); // Ensure the form is not stuck in a submitting state
   };
 
   return (

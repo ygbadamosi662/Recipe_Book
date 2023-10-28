@@ -99,7 +99,7 @@ const Dashboard = ({ reduxUser }) => {
     fetchFf();
   }, [reduxUser._id, navigate, dispatch]);
 
-  const handleFilterSubmit = (values) => {
+  const handleFilterSubmit = (values, actions) => {
     if (values.name === "" && values.ingredients === "" && values.type === "") {
       toast.warning("Filter is empty", {
         position: toast.POSITION.TOP_RIGHT,
@@ -123,7 +123,7 @@ const Dashboard = ({ reduxUser }) => {
 
     query.page = 1;
     query.size = 5;
-    console.log(query);
+    actions.setSubmitting(false);
     setPayload(query);
   };
 

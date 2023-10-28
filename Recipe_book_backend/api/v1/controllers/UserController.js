@@ -378,6 +378,7 @@ class UserController {
       }
       if(value.type) { filter.type = value.type; }
       
+      console.log(filter)
       
       const gather_data_task = Promise.all([
         recipe_repo.get_recs(filter, value.page, value.size), //get recipes

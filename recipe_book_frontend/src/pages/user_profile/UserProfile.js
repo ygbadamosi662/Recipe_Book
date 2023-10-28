@@ -67,7 +67,7 @@ function UserProfile({ reduxUser, reduxLogUser }) {
       ),
   });
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, actions) => {
     const { fname, lname, email, phone, change_pwd, password } = values;
     let query = {};
     // building query
@@ -131,6 +131,7 @@ function UserProfile({ reduxUser, reduxLogUser }) {
         }
       }
     }
+    actions.setSubmitting(false); // Ensure the form is not stuck in a submitting state
   };
 
   return (

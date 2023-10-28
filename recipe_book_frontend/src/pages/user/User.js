@@ -33,6 +33,7 @@ function User({ reduxLogRecipe, reduxUser }) {
   const dispatch = useDispatch();
 
   const { id } = useParams();
+
   const handleChoice = (e) => {
     e.preventDefault();
     const what = e.currentTarget.name;
@@ -53,7 +54,6 @@ function User({ reduxLogRecipe, reduxUser }) {
   const [choice, setChoice] = useState(true);
   const [user, setUser] = useState(null);
   const [showFullHouse, setShowFullHouse] = useState(false);
-
 
   const navigate = useNavigate();  
 

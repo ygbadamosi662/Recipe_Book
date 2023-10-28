@@ -76,7 +76,7 @@ function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
     }),
   });
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, actions) => {
     try {
       // if no changes made
       values.type.toUpperCase();
@@ -141,6 +141,7 @@ function UpdateRecipe({ reduxRecipe, reduxLogRecipe }) {
         return;
       }
     }
+    actions.setSubmitting(false); // Ensure the form is not stuck in a submitting state
   };
 
   return (

@@ -90,6 +90,17 @@
   border: 1px solid black;
 }
 
+.reviews-bk-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 2rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  font-weight: bold;
+}
+
 button {
   background-color: #007bff;
   color: #fff;

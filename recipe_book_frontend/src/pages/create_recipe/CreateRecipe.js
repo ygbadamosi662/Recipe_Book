@@ -19,6 +19,7 @@ const styles = {
     // color: "white",
   },
 };
+
 function CreateRecipe({ reduxLogRecipe }) {
   const dispatch = useDispatch();
 
@@ -69,7 +70,7 @@ function CreateRecipe({ reduxLogRecipe }) {
     }),
   });
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, actions) => {
     const { name, ingredients, description, type, permit, guide } = values;
     const recipe = {
       name: name,
@@ -111,6 +112,7 @@ function CreateRecipe({ reduxLogRecipe }) {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+    actions.setSubmitting(false); // Ensure the form is not stuck in a submitting state
   };
 
   return (

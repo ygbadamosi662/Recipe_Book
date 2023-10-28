@@ -24,6 +24,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
       filter: reduxRecipe._id
     }
   });
+
   const [reviewCount, setReviewCount] = useState(0);
   const [recipe, setRecipe] = useState(null);
 
@@ -132,7 +133,7 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
       .required("Required"),
   });
 
-  const handleReviewSubmit = async (values) => {
+  const handleReviewSubmit = async (values, actions) => {
     try {
       const res = await reviewRecipe(JSON.stringify({
         id: reduxRecipe._id,
@@ -168,8 +169,8 @@ function Recipe({ reduxRecipe, reduxLogRecipe, reduxUserStar, reduxLogReview, re
           });
         }
       }
-      console.log(error)
     }
+    actions.setSubmitting(false); // Ensure the form is not stuck in a submitting state
   };
 
   const handleUpdate = (e) => {

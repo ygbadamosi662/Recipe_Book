@@ -82,11 +82,14 @@ function Reviews({ payload, command }) {
     if (stars > 0) {
       let star_show = [];
       for (let index = 1; index <= stars; index++) {
-        star_show.push(<FaStar key={index} className="selected"/>);
+        star_show.push(0);
       }
       return (
         <div>
-          {star_show}
+          { star_show.map((star, index) => {
+            return <FaStar key={index}/>;
+            })
+          }
         </div>
       );
     }
